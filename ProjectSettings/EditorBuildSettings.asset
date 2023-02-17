@@ -6,8 +6,29 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/ExampleAssets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/Scenes/MainScene.unity
+    guid: 6bdce89659816455b9f906fc62d19910
+  - enabled: 1
+    path: Assets/Scenes/Intro_Minigame.unity
+    guid: 0f65ea988d7abe44bbcb81580f585d37
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Run_Minigame.unity
+    guid: fdb5d7e1b6ea22e4c8f216af025dbcc7
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Puzzle_Minigame.unity
+    guid: ed2f28d9285ba394298ff1ef77713298
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Mist_Minigame.unity
+    guid: f965f1fe3789e7d4b8a6df73115f40cc
+  - enabled: 1
+    path: Assets/Scenes/Minigames/PerspectivePuzzle_Minigame.unity
+    guid: 1b5968ed8800b194e833cc0ec08951b5
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Soup_Minigame.unity
+    guid: 45f1009d0251ee54babba80ea89286ac
+  - enabled: 1
+    path: Assets/Scenes/End_Tutorial.unity
+    guid: 859d3dfd9e243b6478c8afddc9c0ca50
   m_configObjects:
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 744b813df90924c169af73489b8325de,
       type: 2}
