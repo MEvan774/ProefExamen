@@ -4,12 +4,19 @@ using UnityEngine;
 
 public class DragAndDropHandler : MonoBehaviour
 {
+<<<<<<< Updated upstream
     private GameObject _selectedObj;
 
+=======
+    private GameObject selectedObj;
+
+    // Start is called before the first frame update
+>>>>>>> Stashed changes
     void Start()
     {
         if (Input.GetMouseButtonDown(0))
         {
+<<<<<<< Updated upstream
             if (_selectedObj != null)
             {
                 RaycastHit hit = castRay();
@@ -41,6 +48,13 @@ public class DragAndDropHandler : MonoBehaviour
                 Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
                 _selectedObj.transform.position = new Vector3(worldPos.x, worldPos.y, 0.25f);
             }
+=======
+
+        }
+        if(selectedObj != null)
+        {
+
+>>>>>>> Stashed changes
         }
     }
 
