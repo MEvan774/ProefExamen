@@ -1,5 +1,5 @@
 ## Dev Team:
-- Milan Breuren 
+- Milan Breuren (Product Owner)
 - Nanne Veldhuijzen van Zanten (SCRUM Master)
 - Zakaria el Ghoul Aadi (Dev Lead)
 
