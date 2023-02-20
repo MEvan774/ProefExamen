@@ -13,30 +13,30 @@ namespace PitchDetector
     {
         public static readonly double InverseLog2 = 1.0 / Math.Log10(2.0);
 
-        private const int kCourseOctaveSteps = 96;
-        private const int kScanHiSize = 31;
-        private const float kScanHiFreqStep = 1.005f;
-        private const int kMinMidiNote = 21;  // A0
-        private const int kMaxMidiNote = 108; // C8
+        private const int _kCourseOctaveSteps = 96;
+        private const int _kScanHiSize = 31;
+        private const float _kScanHiFreqStep = 1.005f;
+        private const int _kMinMidiNote = 21;  // A0
+        private const int _kMaxMidiNote = 108; // C8
 
-        private float m_minPitch;
-        private float m_maxPitch;
-        private int   m_minNote;
-        private int   m_maxNote;
-        private int   m_blockLen14;	   // 1/4 block len
-        private int   m_blockLen24;	   // 2/4 block len
-        private int   m_blockLen34;	   // 3/4 block len
-        private int   m_blockLen44;	   // 4/4 block len
-        private double m_sampleRate;
-        private float m_detectLevelThreshold;
+        private float _minPitch;
+        private float _maxPitch;
+        private int   _minNote;
+        private int   _maxNote;
+        private int   _blockLen14;	   // 1/4 block len
+        private int   _blockLen24;	   // 2/4 block len
+        private int   _blockLen34;	   // 3/4 block len
+        private int   _blockLen44;	   // 4/4 block len
+        private double _sampleRate;
+        private float _detectLevelThreshold;
 
-        private int m_numCourseSteps;
-        private float[] m_pCourseFreqOffset;
-        private float[] m_pCourseFreq;
-        private float[] m_scanHiOffset = new float[kScanHiSize];
-        private float[] m_peakBuf = new float[kScanHiSize];
-        private int m_prevPitchIdx;
-        private float[] m_detectCurve;
+        private int _numCourseSteps;
+        private float[] _pCourseFreqOffset;
+        private float[] _pCourseFreq;
+        private float[] _scanHiOffset = new float[_kScanHiSize];
+        private float[] _peakBuf = new float[_kScanHiSize];
+        private int _prevPitchIdx;
+        private float[] _detectCurve;
 
         /// <summary>
         /// Constructor
@@ -47,39 +47,39 @@ namespace PitchDetector
         /// <param name="fFreqStep"></param>
         public PitchDsp(double sampleRate, float minPitch, float maxPitch, float detectLevelThreshold)
         {
-            m_sampleRate = sampleRate;
-            m_minPitch = minPitch;
-            m_maxPitch = maxPitch;
-            m_detectLevelThreshold = detectLevelThreshold;
+            _sampleRate = sampleRate;
+            _minPitch = minPitch;
+            _maxPitch = maxPitch;
+            _detectLevelThreshold = detectLevelThreshold;
 
-            m_minNote = (int)(PitchToMidiNote(m_minPitch) + 0.5f) + 2;
-            m_maxNote = (int)(PitchToMidiNote(m_maxPitch) + 0.5f) - 2;
+            _minNote = (int)(PitchToMidiNote(_minPitch) + 0.5f) + 2;
+            _maxNote = (int)(PitchToMidiNote(_maxPitch) + 0.5f) - 2;
 
-            m_blockLen44 = (int)(m_sampleRate / m_minPitch + 0.5f);
-            m_blockLen34 = (m_blockLen44 * 3) / 4;
-            m_blockLen24 = m_blockLen44 / 2;
-            m_blockLen14 = m_blockLen44 / 4;
+            _blockLen44 = (int)(_sampleRate / _minPitch + 0.5f);
+            _blockLen34 = (_blockLen44 * 3) / 4;
+            _blockLen24 = _blockLen44 / 2;
+            _blockLen14 = _blockLen44 / 4;
 
-            m_numCourseSteps = (int)((Math.Log((double)m_maxPitch / (double)m_minPitch) / Math.Log(2.0)) * kCourseOctaveSteps + 0.5) + 3;
+            _numCourseSteps = (int)((Math.Log((double)_maxPitch / (double)_minPitch) / Math.Log(2.0)) * _kCourseOctaveSteps + 0.5) + 3;
 
-            m_pCourseFreqOffset = new float[m_numCourseSteps + 10000];
-            m_pCourseFreq = new float[m_numCourseSteps + 10000];
+            _pCourseFreqOffset = new float[_numCourseSteps + 10000];
+            _pCourseFreq = new float[_numCourseSteps + 10000];
 
-            m_detectCurve = new float[m_numCourseSteps];
+            _detectCurve = new float[_numCourseSteps];
 
-            var freqStep = 1.0 / Math.Pow(2.0, 1.0 / kCourseOctaveSteps);
-            var curFreq = m_maxPitch / freqStep;
+            var freqStep = 1.0 / Math.Pow(2.0, 1.0 / _kCourseOctaveSteps);
+            var curFreq = _maxPitch / freqStep;
 
             // frequency is stored from high to low
-            for (int idx = 0; idx < m_numCourseSteps; idx++)
+            for (int idx = 0; idx < _numCourseSteps; idx++)
             {
-                m_pCourseFreq[idx] = (float)curFreq;
-                m_pCourseFreqOffset[idx] = (float)(m_sampleRate / curFreq);
+                _pCourseFreq[idx] = (float)curFreq;
+                _pCourseFreqOffset[idx] = (float)(_sampleRate / curFreq);
                 curFreq *= freqStep;
             }
 
-            for (int idx = 0; idx < kScanHiSize; idx++)
-                m_scanHiOffset[idx] = (float)Math.Pow(kScanHiFreqStep, (kScanHiSize / 2) - idx);
+            for (int idx = 0; idx < _kScanHiSize; idx++)
+                _scanHiOffset[idx] = (float)Math.Pow(_kScanHiFreqStep, (_kScanHiSize / 2) - idx);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace PitchDetector
         /// </summary>
         public float MaxPitch
         {
-            get { return m_maxPitch; }
+            get { return _maxPitch; }
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace PitchDetector
         /// </summary>
         public float MinPitch
         {
-            get { return m_minPitch; }
+            get { return _minPitch; }
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace PitchDetector
         /// </summary>
         public int MaxNote
         {
-            get { return m_maxNote; }
+            get { return _maxNote; }
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace PitchDetector
         /// </summary>
         public int MinNote
         {
-            get { return m_minNote; }
+            get { return _minNote; }
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace PitchDetector
         {
             var pitch = 0.0f;
 
-            if (!LevelIsAbove(samplesLo, numSamples, m_detectLevelThreshold) &&
-                !LevelIsAbove(samplesHi, numSamples, m_detectLevelThreshold))
+            if (!LevelIsAbove(samplesLo, numSamples, _detectLevelThreshold) &&
+                !LevelIsAbove(samplesHi, numSamples, _detectLevelThreshold))
             {
                 // Level is too low
                 return 0.0f;
@@ -143,7 +143,7 @@ namespace PitchDetector
         /// <returns></returns>
         private float DetectPitchLo(float[] samplesLo, float[] samplesHi)
         {
-            m_detectCurve.Clear();
+            _detectCurve.Clear();
 
             const int skipSize = 8;
             const int peakScanSize = 23;
@@ -153,9 +153,9 @@ namespace PitchDetector
             var peakThresh2 = 600.0f;
             var bufferSwitched = false;
 
-            for (int idx = 0; idx < m_numCourseSteps; idx += skipSize)
+            for (int idx = 0; idx < _numCourseSteps; idx += skipSize)
             {
-                var blockLen = Math.Min(m_blockLen44, (int)m_pCourseFreqOffset[idx] * 2);
+                var blockLen = Math.Min(_blockLen44, (int)_pCourseFreqOffset[idx] * 2);
                 float[] curSamples = null;
 
                 // 258 is at 250 Hz, which is the switchover frequency for the two filters
@@ -165,7 +165,7 @@ namespace PitchDetector
                 {
                     if (!bufferSwitched)
                     {
-                        m_detectCurve.Clear(258 - peakScanSizeHalf, 258 + peakScanSizeHalf);
+                        _detectCurve.Clear(258 - peakScanSizeHalf, 258 + peakScanSizeHalf);
                         bufferSwitched = true;
                     }
 
@@ -177,7 +177,7 @@ namespace PitchDetector
                 }
 
                 var stepSizeLoRes = blockLen / 10;
-                var stepSizeHiRes = Math.Max(1, Math.Min(5, idx * 5 / m_numCourseSteps));
+                var stepSizeHiRes = Math.Max(1, Math.Min(5, idx * 5 / _numCourseSteps));
 
                 float fValue = RatioAbsDiffLinear(curSamples, idx, blockLen, stepSizeLoRes, false);
 
@@ -190,7 +190,7 @@ namespace PitchDetector
                     var dir = 4;		 // start going forward
                     var curPos = idx;	 // start at center of the scan range
                     var begSearch = Math.Max(idx - peakScanSizeHalf, 0);
-                    var endSearch = Math.Min(idx + peakScanSizeHalf, m_numCourseSteps - 1);
+                    var endSearch = Math.Min(idx + peakScanSizeHalf, _numCourseSteps - 1);
 
                     while (curPos >= begSearch && curPos < endSearch)
                     {
@@ -208,13 +208,13 @@ namespace PitchDetector
 
                             if (dir == 0)
                             {
-                                if (peakVal > peakThresh2 && peakIdx >= 6 && peakIdx <= m_numCourseSteps - 7)
+                                if (peakVal > peakThresh2 && peakIdx >= 6 && peakIdx <= _numCourseSteps - 7)
                                 {
                                     var fValL = RatioAbsDiffLinear(curSamples, peakIdx - 5, blockLen, stepSizeHiRes, true);
                                     var fValR = RatioAbsDiffLinear(curSamples, peakIdx + 5, blockLen, stepSizeHiRes, true);
                                     var fPointy = peakVal / (fValL + fValR) * 2.0f;
 
-                                    var minPointy = (m_prevPitchIdx > 0 && Math.Abs(m_prevPitchIdx - peakIdx) < 10) ? 1.2f : 1.5f;
+                                    var minPointy = (_prevPitchIdx > 0 && Math.Abs(_prevPitchIdx - peakIdx) < 10) ? 1.2f : 1.5f;
 
                                     if (fPointy > minPointy)
                                     {
@@ -222,7 +222,7 @@ namespace PitchDetector
 
                                         if (pitchHi > 1.0f)
                                         {
-                                            m_prevPitchIdx = peakIdx;
+                                            _prevPitchIdx = peakIdx;
                                             return pitchHi;
                                         }
                                     }
@@ -238,7 +238,7 @@ namespace PitchDetector
                 }
             }
 
-            m_prevPitchIdx = 0;
+            _prevPitchIdx = 0;
             return 0.0f;
         }
 
@@ -253,42 +253,42 @@ namespace PitchDetector
             var peakIdx = -1;
             var prevVal = 0.0f;
             var dir = 4;     // start going forward
-            var curPos = kScanHiSize >> 1;	 // start at center of the scan range
+            var curPos = _kScanHiSize >> 1;	 // start at center of the scan range
 
-            m_peakBuf.Clear();
+            _peakBuf.Clear();
 
-            float offset = m_pCourseFreqOffset[lowFreqIdx];
+            float offset = _pCourseFreqOffset[lowFreqIdx];
 
-            while (curPos >= 0 && curPos < kScanHiSize)
+            while (curPos >= 0 && curPos < _kScanHiSize)
             {
-                if (m_peakBuf[curPos] == 0.0f)
-                    m_peakBuf[curPos] = SumAbsDiffHermite(samples, offset * m_scanHiOffset[curPos], m_blockLen44, 1);
+                if (_peakBuf[curPos] == 0.0f)
+                    _peakBuf[curPos] = SumAbsDiffHermite(samples, offset * _scanHiOffset[curPos], _blockLen44, 1);
 
-                if (peakIdx < 0 || m_peakBuf[peakIdx] < m_peakBuf[curPos])
+                if (peakIdx < 0 || _peakBuf[peakIdx] < _peakBuf[curPos])
                     peakIdx = curPos;
 
-                if (prevVal > m_peakBuf[curPos])
+                if (prevVal > _peakBuf[curPos])
                 {
                     dir = -dir >> 1;
 
                     if (dir == 0)
                     {
                         // found the peak
-                        var minVal = Math.Min(m_peakBuf[peakIdx - 1], m_peakBuf[peakIdx + 1]);
+                        var minVal = Math.Min(_peakBuf[peakIdx - 1], _peakBuf[peakIdx + 1]);
 
                         minVal -= minVal * (1.0f / 32.0f);
 
-                        var y1 = (float)Math.Log10(m_peakBuf[peakIdx - 1] - minVal);
-                        var y2 = (float)Math.Log10(m_peakBuf[peakIdx] - minVal);
-                        var y3 = (float)Math.Log10(m_peakBuf[peakIdx + 1] - minVal);
+                        var y1 = (float)Math.Log10(_peakBuf[peakIdx - 1] - minVal);
+                        var y2 = (float)Math.Log10(_peakBuf[peakIdx] - minVal);
+                        var y3 = (float)Math.Log10(_peakBuf[peakIdx + 1] - minVal);
 
                         var fIdx = (float)peakIdx + (y3 - y1) / (2.0f * (2.0f * y2 - y1 - y3));
 
-                        return (float)Math.Pow(kScanHiFreqStep, fIdx - (kScanHiSize / 2)) * m_pCourseFreq[lowFreqIdx];
+                        return (float)Math.Pow(_kScanHiFreqStep, fIdx - (_kScanHiSize / 2)) * _pCourseFreq[lowFreqIdx];
                     }
                 }
 
-                prevVal = m_peakBuf[curPos];
+                prevVal = _peakBuf[curPos];
                 curPos += dir;
             }
 
@@ -399,11 +399,11 @@ namespace PitchDetector
         /// </summary>
         private float RatioAbsDiffLinear(float[] samples, int freqIdx, int blockLen, int stepSize, bool hiRes)
         {
-            if (hiRes && m_detectCurve[freqIdx] > 0.0f)
-                return m_detectCurve[freqIdx];
+            if (hiRes && _detectCurve[freqIdx] > 0.0f)
+                return _detectCurve[freqIdx];
 
-            var offsetInt = (int)m_pCourseFreqOffset[freqIdx];
-            var offsetFrac = m_pCourseFreqOffset[freqIdx] - offsetInt;
+            var offsetInt = (int)_pCourseFreqOffset[freqIdx];
+            var offsetFrac = _pCourseFreqOffset[freqIdx] - offsetInt;
             var rect = 0.0f;
             var absDiff = 0.01f;   // prevent divide by zero
             var count = 0;
@@ -422,7 +422,7 @@ namespace PitchDetector
             var finalVal = rect / absDiff * 100.0f;
 
             if (hiRes)
-                m_detectCurve[freqIdx] = finalVal;
+                _detectCurve[freqIdx] = finalVal;
 
             return finalVal;
         }
@@ -498,7 +498,7 @@ namespace PitchDetector
                 return 0.0f;
 
             var pitch = (float)Math.Pow(10.0, (note - 33.0f) / InverseLog2 / 12.0f) * 55.0f;
-            return pitch <= m_maxPitch ? pitch : 0.0f;
+            return pitch <= _maxPitch ? pitch : 0.0f;
         }
 
         /// <summary>
@@ -510,10 +510,10 @@ namespace PitchDetector
         /// <returns></returns>
         public static string GetNoteName(int note, bool sharps, bool showOctave)
         {
-            if (note < kMinMidiNote || note > kMaxMidiNote)
+            if (note < _kMinMidiNote || note > _kMaxMidiNote)
                 return null;
 
-            note -= kMinMidiNote;
+            note -= _kMinMidiNote;
 
             int octave = (note + 9) / 12;
             note = note % 12;

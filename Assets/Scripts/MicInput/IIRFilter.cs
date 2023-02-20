@@ -34,24 +34,24 @@ namespace PitchDetector
         const int kHistMask = 31;
         const int kHistSize = 32;
 
-        private int m_order;
-        private ProtoType m_protoType;
-        private FilterType m_filterType;
+        private int _order;
+        private ProtoType _protoType;
+        private FilterType _filterType;
 
-        private float m_fp1;
-        private float m_fp2;
-        private float m_fN;
-        private float m_ripple;
-        private float m_sampleRate;
-        private double[] m_real;
-        private double[] m_imag;
-        private double[] m_z;
-        private double[] m_aCoeff;
-        private double[] m_bCoeff;
-        private double[] m_inHistory;
-        private double[] m_outHistory;
-        private int m_histIdx;
-        private bool m_invertDenormal;
+        private float _fp1;
+        private float _fp2;
+        private float _fN;
+        private float _ripple;
+        private float _sampleRate;
+        private double[] _reals;
+        private double[] _imags;
+        private double[] _zs;
+        private double[] _aCoeffs;
+        private double[] _bCoeffs;
+        private double[] _inHistories;
+        private double[] _outHistories;
+        private int _histIdxs;
+        private bool _isInvertDenormal;
 
         public IIRFilter()
         {
@@ -64,33 +64,33 @@ namespace PitchDetector
         {
             get
             {
-                if (m_order < 1 || m_order > 16 ||
-                    m_protoType == ProtoType.None ||
-                    m_filterType == FilterType.None ||
-                    m_sampleRate <= 0.0f ||
-                    m_fN <= 0.0f)
+                if (_order < 1 || _order > 16 ||
+                    _protoType == ProtoType.None ||
+                    _filterType == FilterType.None ||
+                    _sampleRate <= 0.0f ||
+                    _fN <= 0.0f)
                     return false;
 
-                switch (m_filterType)
+                switch (_filterType)
                 {
                     case FilterType.LP:
-                        if (m_fp2 <= 0.0f)
+                        if (_fp2 <= 0.0f)
                             return false;
                         break;
 
                     case FilterType.BP:
-                        if (m_fp1 <= 0.0f || m_fp2 <= 0.0f || m_fp1 >= m_fp2)
+                        if (_fp1 <= 0.0f || _fp2 <= 0.0f || _fp1 >= _fp2)
                             return false;
                         break;
 
                     case FilterType.HP:
-                        if (m_fp1 <= 0.0f)
+                        if (_fp1 <= 0.0f)
                             return false;
                         break;
                 }
 
                 // For bandpass, the order must be even
-                if (m_filterType == FilterType.BP && (m_order & 1) != 0)
+                if (_filterType == FilterType.BP && (_order & 1) != 0)
                     return false;
 
                 return true;
@@ -102,11 +102,11 @@ namespace PitchDetector
         /// </summary>
         public ProtoType Proto
         {
-            get { return m_protoType; }
+            get { return _protoType; }
 
             set
             {
-                m_protoType = value;
+                _protoType = value;
                 Design();
             }
         }
@@ -116,25 +116,25 @@ namespace PitchDetector
         /// </summary>
         public FilterType Type
         {
-            get { return m_filterType; }
+            get { return _filterType; }
 
             set
             {
-                m_filterType = value;
+                _filterType = value;
                 Design();
             }
         }
 
         public int Order
         {
-            get { return m_order; }
+            get { return _order; }
 
             set
             {
-                m_order = Math.Min(16, Math.Max(1, Math.Abs(value)));
+                _order = Math.Min(16, Math.Max(1, Math.Abs(value)));
 
-                if (m_filterType == FilterType.BP && Odd(m_order))
-                    m_order++;
+                if (_filterType == FilterType.BP && Odd(_order))
+                    _order++;
 
                 Design();
             }
@@ -142,45 +142,45 @@ namespace PitchDetector
 
         public float SampleRate
         {
-            get { return m_sampleRate; }
+            get { return _sampleRate; }
 
             set
             {
-                m_sampleRate = value;
-                m_fN = 0.5f * m_sampleRate;
+                _sampleRate = value;
+                _fN = 0.5f * _sampleRate;
                 Design();
             }
         }
 
         public float FreqLow
         {
-            get { return m_fp1; }
+            get { return _fp1; }
 
             set
             {
-                m_fp1 = value;
+                _fp1 = value;
                 Design();
             }
         }
 
         public float FreqHigh
         {
-            get { return m_fp2; }
+            get { return _fp2; }
 
             set
             {
-                m_fp2 = value;
+                _fp2 = value;
                 Design();
             }
         }
 
         public float Ripple
         {
-            get { return m_ripple; }
+            get { return _ripple; }
 
             set
             {
-                m_ripple = value;
+                _ripple = value;
                 Design();
             }
         }
@@ -221,15 +221,15 @@ namespace PitchDetector
         /// </summary>
         private void LocatePolesAndZeros()
         {
-            m_real = new double[m_order + 1];
-            m_imag = new double[m_order + 1];
-            m_z = new double[m_order + 1];
+            _reals = new double[_order + 1];
+            _imags = new double[_order + 1];
+            _zs = new double[_order + 1];
             double ln10 = Math.Log(10.0);
 
             // Butterworth, Chebyshev parameters
-            int n = m_order;
+            int n = _order;
 
-            if (m_filterType == FilterType.BP)
+            if (_filterType == FilterType.BP)
                 n = n / 2;
 
             int ir = n % 2;
@@ -237,18 +237,18 @@ namespace PitchDetector
             int n2 = (3 * n + ir) / 2 - 1;
             double f1;
 
-            switch (m_filterType)
+            switch (_filterType)
             {
                 case FilterType.LP:
-                    f1 = m_fp2;
+                    f1 = _fp2;
                     break;
 
                 case FilterType.HP:
-                    f1 = m_fN - m_fp1;
+                    f1 = _fN - _fp1;
                     break;
 
                 case FilterType.BP:
-                    f1 = m_fp2 - m_fp1;
+                    f1 = _fp2 - _fp1;
                     break;
 
                 default:
@@ -256,7 +256,7 @@ namespace PitchDetector
                     break;
             }
 
-            double tanw1 = Math.Tan(0.5 * Math.PI * f1 / m_fN);
+            double tanw1 = Math.Tan(0.5 * Math.PI * f1 / _fN);
             double tansqw1 = Sqr(tanw1);
 
             // Real and Imaginary parts of low-pass poles
@@ -266,7 +266,7 @@ namespace PitchDetector
             {
                 t = 0.5 * (2 * k + 1 - ir) * Math.PI / (double)n;
 
-                switch (m_protoType)
+                switch (_protoType)
                 {
                     case ProtoType.Butterworth:
                         double b3 = 1.0 - 2.0 * tanw1 * Math.Cos(t) + tansqw1;
@@ -275,7 +275,7 @@ namespace PitchDetector
                         break;
 
                     case ProtoType.Chebyshev:
-                        double d = 1.0 - Math.Exp(-0.05 * m_ripple * ln10);
+                        double d = 1.0 - Math.Exp(-0.05 * _ripple * ln10);
                         double e = 1.0 / Math.Sqrt(1.0 / Sqr(1.0 - d) - 1.0);
                         double x = Math.Pow(Math.Sqrt(e * e + 1.0) + e, 1.0 / (double)n);
                         a = 0.5 * (x - 1.0 / x);
@@ -289,37 +289,37 @@ namespace PitchDetector
                 }
 
                 int m = 2 * (n2 - k) + 1;
-                m_real[m + ir] = r;
-                m_imag[m + ir] = Math.Abs(i);
-                m_real[m + ir + 1] = r;
-                m_imag[m + ir + 1] = -Math.Abs(i);
+                _reals[m + ir] = r;
+                _imags[m + ir] = Math.Abs(i);
+                _reals[m + ir + 1] = r;
+                _imags[m + ir + 1] = -Math.Abs(i);
             }
 
             if (Odd(n))
             {
-                if (m_protoType == ProtoType.Butterworth)
+                if (_protoType == ProtoType.Butterworth)
                     r = (1.0 - tansqw1) / (1.0 + 2.0 * tanw1 + tansqw1);
 
-                if (m_protoType == ProtoType.Chebyshev)
+                if (_protoType == ProtoType.Chebyshev)
                     r = 2.0 / (1.0 + a * tanw1) - 1.0;
 
-                m_real[1] = r;
-                m_imag[1] = 0.0;
+                _reals[1] = r;
+                _imags[1] = 0.0;
             }
 
-            switch (m_filterType)
+            switch (_filterType)
             {
                 case FilterType.LP:
                     for (int m = 1; m <= n; m++)
-                        m_z[m] = -1.0;
+                        _zs[m] = -1.0;
                     break;
 
                 case FilterType.HP:
                     // Low-pass to high-pass transformation
                     for (int m = 1; m <= n; m++)
                     {
-                        m_real[m] = -m_real[m];
-                        m_z[m] = 1.0;
+                        _reals[m] = -_reals[m];
+                        _zs[m] = 1.0;
                     }
                     break;
 
@@ -327,20 +327,20 @@ namespace PitchDetector
                     // Low-pass to bandpass transformation
                     for (int m = 1; m <= n; m++)
                     {
-                        m_z[m] = 1.0;
-                        m_z[m + n] = -1.0;
+                        _zs[m] = 1.0;
+                        _zs[m + n] = -1.0;
                     }
 
-                    double f4 = 0.5 * Math.PI * m_fp1 / m_fN;
-                    double f5 = 0.5 * Math.PI * m_fp2 / m_fN;
+                    double f4 = 0.5 * Math.PI * _fp1 / _fN;
+                    double f5 = 0.5 * Math.PI * _fp2 / _fN;
                     double aa = Math.Cos(f4 + f5) / Math.Cos(f5 - f4);
                     double aR, aI, h1, h2, p1R, p2R, p1I, p2I;
 
-                    for (int m1 = 0; m1 <= (m_order - 1) / 2; m1++)
+                    for (int m1 = 0; m1 <= (_order - 1) / 2; m1++)
                     {
                         int m = 1 + 2 * m1;
-                        aR = m_real[m];
-                        aI = m_imag[m];
+                        aR = _reals[m];
+                        aI = _imags[m];
 
                         if (Math.Abs(aI) < 0.0001)
                         {
@@ -375,25 +375,25 @@ namespace PitchDetector
                             p2I = fI - sI;
                         }
 
-                        m_real[m] = p1R;
-                        m_real[m + 1] = p2R;
-                        m_imag[m] = p1I;
-                        m_imag[m + 1] = p2I;
+                        _reals[m] = p1R;
+                        _reals[m + 1] = p2R;
+                        _imags[m] = p1I;
+                        _imags[m + 1] = p2I;
                     }
 
                     if (Odd(n))
                     {
-                        m_real[2] = m_real[n + 1];
-                        m_imag[2] = m_imag[n + 1];
+                        _reals[2] = _reals[n + 1];
+                        _imags[2] = _imags[n + 1];
                     }
 
                     for (int k = n; k >= 1; k--)
                     {
                         int m = 2 * k - 1;
-                        m_real[m] = m_real[k];
-                        m_real[m + 1] = m_real[k];
-                        m_imag[m] = Math.Abs(m_imag[k]);
-                        m_imag[m + 1] = -Math.Abs(m_imag[k]);
+                        _reals[m] = _reals[k];
+                        _reals[m + 1] = _reals[k];
+                        _imags[m] = Math.Abs(_imags[k]);
+                        _imags[m + 1] = -Math.Abs(_imags[k]);
                     }
 
                     break;
@@ -408,60 +408,60 @@ namespace PitchDetector
             if (!this.FilterValid)
                 return;
 
-            m_aCoeff = new double[m_order + 1];
-            m_bCoeff = new double[m_order + 1];
-            m_inHistory = new double[kHistSize];
-            m_outHistory = new double[kHistSize];
+            _aCoeffs = new double[_order + 1];
+            _bCoeffs = new double[_order + 1];
+            _inHistories = new double[kHistSize];
+            _outHistories = new double[kHistSize];
 
-            double[] newA = new double[m_order + 1];
-            double[] newB = new double[m_order + 1];
+            double[] newA = new double[_order + 1];
+            double[] newB = new double[_order + 1];
 
             // Find filter poles and zeros
             LocatePolesAndZeros();
 
             // Compute filter coefficients from pole/zero values
-            m_aCoeff[0] = 1.0;
-            m_bCoeff[0] = 1.0;
+            _aCoeffs[0] = 1.0;
+            _bCoeffs[0] = 1.0;
 
-            for (int i = 1; i <= m_order; i++)
+            for (int i = 1; i <= _order; i++)
             {
-                m_aCoeff[i] = 0.0;
-                m_bCoeff[i] = 0.0;
+                _aCoeffs[i] = 0.0;
+                _bCoeffs[i] = 0.0;
             }
 
             int k = 0;
-            int n = m_order;
+            int n = _order;
             int pairs = n / 2;
 
-            if (Odd(m_order))
+            if (Odd(_order))
             {
                 // First subfilter is first order
-                m_aCoeff[1] = -m_z[1];
-                m_bCoeff[1] = -m_real[1];
+                _aCoeffs[1] = -_zs[1];
+                _bCoeffs[1] = -_reals[1];
                 k = 1;
             }
 
             for (int p = 1; p <= pairs; p++)
             {
                 int m = 2 * p - 1 + k;
-                double alpha1 = -(m_z[m] + m_z[m + 1]);
-                double alpha2 = m_z[m] * m_z[m + 1];
-                double beta1 = -2.0 * m_real[m];
-                double beta2 = Sqr(m_real[m]) + Sqr(m_imag[m]);
+                double alpha1 = -(_zs[m] + _zs[m + 1]);
+                double alpha2 = _zs[m] * _zs[m + 1];
+                double beta1 = -2.0 * _reals[m];
+                double beta2 = Sqr(_reals[m]) + Sqr(_imags[m]);
 
-                newA[1] = m_aCoeff[1] + alpha1 * m_aCoeff[0];
-                newB[1] = m_bCoeff[1] + beta1 * m_bCoeff[0];
+                newA[1] = _aCoeffs[1] + alpha1 * _aCoeffs[0];
+                newB[1] = _bCoeffs[1] + beta1 * _bCoeffs[0];
 
                 for (int i = 2; i <= n; i++)
                 {
-                    newA[i] = m_aCoeff[i] + alpha1 * m_aCoeff[i - 1] + alpha2 * m_aCoeff[i - 2];
-                    newB[i] = m_bCoeff[i] + beta1 * m_bCoeff[i - 1] + beta2 * m_bCoeff[i - 2];
+                    newA[i] = _aCoeffs[i] + alpha1 * _aCoeffs[i - 1] + alpha2 * _aCoeffs[i - 2];
+                    newB[i] = _bCoeffs[i] + beta1 * _bCoeffs[i - 1] + beta2 * _bCoeffs[i - 2];
                 }
 
                 for (int i = 1; i <= n; i++)
                 {
-                    m_aCoeff[i] = newA[i];
-                    m_bCoeff[i] = newB[i];
+                    _aCoeffs[i] = newA[i];
+                    _bCoeffs[i] = newB[i];
                 }
             }
 
@@ -474,13 +474,13 @@ namespace PitchDetector
         /// </summary>
         public void Reset()
         {
-            if (m_inHistory != null)
-                m_inHistory.Clear();
+            if (_inHistories != null)
+                _inHistories.Clear();
 
-            if (m_outHistory != null)
-                m_outHistory.Clear();
+            if (_outHistories != null)
+                _outHistories.Clear();
 
-            m_histIdx = 0;
+            _histIdxs = 0;
         }
 
         /// <summary>
@@ -489,23 +489,23 @@ namespace PitchDetector
         /// <param name="historyValue"></param>
         public void Reset(double startValue)
         {
-            m_histIdx = 0;
+            _histIdxs = 0;
 
-            if (m_inHistory == null || m_outHistory == null)
+            if (_inHistories == null || _outHistories == null)
                 return;
 
-            m_inHistory.Fill(startValue);
+            _inHistories.Fill(startValue);
 
-            if (m_inHistory != null)
+            if (_inHistories != null)
             {
-                switch (m_filterType)
+                switch (_filterType)
                 {
                     case FilterType.LP:
-                        m_outHistory.Fill(startValue);
+                        _outHistories.Fill(startValue);
                         break;
 
                     default:
-                        m_outHistory.Clear();
+                        _outHistories.Clear();
                         break;
                 }
             }
@@ -518,23 +518,23 @@ namespace PitchDetector
         public void FilterBuffer(float[] srcBuf, long srcPos, float[] dstBuf, long dstPos, long nLen)
         {
             const double kDenormal = 0.000000000000001;
-            double denormal = m_invertDenormal ? -kDenormal : kDenormal;
-            m_invertDenormal = !m_invertDenormal;
+            double denormal = _isInvertDenormal ? -kDenormal : kDenormal;
+            _isInvertDenormal = !_isInvertDenormal;
 
             for (int sampleIdx = 0; sampleIdx < nLen; sampleIdx++)
             {
                 double sum = 0.0f;
 
-                m_inHistory[m_histIdx] = srcBuf[srcPos + sampleIdx] + denormal;
+                _inHistories[_histIdxs] = srcBuf[srcPos + sampleIdx] + denormal;
 
-                for (int idx = 0; idx < m_aCoeff.Length; idx++)
-                    sum += m_aCoeff[idx] * m_inHistory[(m_histIdx - idx) & kHistMask];
+                for (int idx = 0; idx < _aCoeffs.Length; idx++)
+                    sum += _aCoeffs[idx] * _inHistories[(_histIdxs - idx) & kHistMask];
 
-                for (int idx = 1; idx < m_bCoeff.Length; idx++)
-                    sum -= m_bCoeff[idx] * m_outHistory[(m_histIdx - idx) & kHistMask];
+                for (int idx = 1; idx < _bCoeffs.Length; idx++)
+                    sum -= _bCoeffs[idx] * _outHistories[(_histIdxs - idx) & kHistMask];
 
-                m_outHistory[m_histIdx] = sum;
-                m_histIdx = (m_histIdx + 1) & kHistMask;
+                _outHistories[_histIdxs] = sum;
+                _histIdxs = (_histIdxs + 1) & kHistMask;
                 dstBuf[dstPos + sampleIdx] = (float)sum;
             }
         }
@@ -543,16 +543,16 @@ namespace PitchDetector
         {
             double sum = 0.0f;
 
-            m_inHistory[m_histIdx] = inVal;
+            _inHistories[_histIdxs] = inVal;
 
-            for (int idx = 0; idx < m_aCoeff.Length; idx++)
-                sum += m_aCoeff[idx] * m_inHistory[(m_histIdx - idx) & kHistMask];
+            for (int idx = 0; idx < _aCoeffs.Length; idx++)
+                sum += _aCoeffs[idx] * _inHistories[(_histIdxs - idx) & kHistMask];
 
-            for (int idx = 1; idx < m_bCoeff.Length; idx++)
-                sum -= m_bCoeff[idx] * m_outHistory[(m_histIdx - idx) & kHistMask];
+            for (int idx = 1; idx < _bCoeffs.Length; idx++)
+                sum -= _bCoeffs[idx] * _outHistories[(_histIdxs - idx) & kHistMask];
 
-            m_outHistory[m_histIdx] = sum;
-            m_histIdx = (m_histIdx + 1) & kHistMask;
+            _outHistories[_histIdxs] = sum;
+            _histIdxs = (_histIdxs + 1) & kHistMask;
 
             return (float)sum;
         }
@@ -586,14 +586,14 @@ namespace PitchDetector
                 sbc = 0.0f;
                 sbs = 0.0f;
 
-                for (int k = 0; k <= m_order; k++)
+                for (int k = 0; k <= _order; k++)
                 {
                     c = Math.Cos(k * theta);
                     s = Math.Sin(k * theta);
-                    sac += c * m_aCoeff[k];
-                    sas += s * m_aCoeff[k];
-                    sbc += c * m_bCoeff[k];
-                    sbs += s * m_bCoeff[k];
+                    sac += c * _aCoeffs[k];
+                    sas += s * _aCoeffs[k];
+                    sbc += c * _bCoeffs[k];
+                    sbs += s * _bCoeffs[k];
                 }
 
                 g[i] = sc * (float)Math.Log((Sqr(sac) + Sqr(sas)) / (Sqr(sbc) + Sqr(sbs)));
@@ -607,8 +607,8 @@ namespace PitchDetector
             // Normalize numerator (a) coefficients
             float normFactor = (float)Math.Pow(10.0, -0.05 * gMax);
 
-            for (int i = 0; i <= m_order; i++)
-                m_aCoeff[i] *= normFactor;
+            for (int i = 0; i <= _order; i++)
+                _aCoeffs[i] *= normFactor;
 
             return g;
         }

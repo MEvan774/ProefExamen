@@ -12,28 +12,28 @@ namespace PitchDetector
 {
 	public class Detector
 	{
-		PitchTracker tracker;
+		private PitchTracker _tracker;
 		public Detector ()
 		{
-			tracker = new PitchTracker();
-			tracker.PitchRecordHistorySize = 20;
-			tracker.RecordPitchRecords = true;
+			_tracker = new PitchTracker();
+			_tracker.PitchRecordHistorySize = 20;
+			_tracker.RecordPitchRecords = true;
 		}
 
 		public void setSampleRate(int samplerate) {
-			tracker.SampleRate = samplerate;
+			_tracker.SampleRate = samplerate;
 		}
 
 		public void DetectPitch(float[] inBuffer) {
-			tracker.ProcessBuffer (inBuffer);
+			_tracker.ProcessBuffer (inBuffer);
 		}
 
 		public int findModa(int count) {
 			int moda = 0;
 			int veces = 0;
-			count = (count > tracker.PitchRecordHistorySize) ? tracker.PitchRecordHistorySize : count;
-			for (int i=tracker.PitchRecordHistorySize-count; i<tracker.PitchRecordHistorySize; i++) {
-				PitchTracker.PitchRecord rec=(PitchTracker.PitchRecord)tracker.PitchRecords[i];
+			count = (count > _tracker.PitchRecordHistorySize) ? _tracker.PitchRecordHistorySize : count;
+			for (int i=_tracker.PitchRecordHistorySize-count; i<_tracker.PitchRecordHistorySize; i++) {
+				PitchTracker.PitchRecord rec=(PitchTracker.PitchRecord)_tracker.PitchRecords[i];
 				if(repetitions(i, count)>veces)
 					moda=rec.MidiNote;
 			}
@@ -41,19 +41,19 @@ namespace PitchDetector
 		}
 
 		public int lastMidiNote (int buffer=0) {
-			return tracker.CurrentPitchRecord.MidiNote;
+			return _tracker.CurrentPitchRecord.MidiNote;
 		}
 
 		public float lastMidiNotePrecise (int buffer=0) {
-			return (float)tracker.CurrentPitchRecord.MidiNote + ((float)tracker.CurrentPitchRecord.MidiCents/100f);
+			return (float)_tracker.CurrentPitchRecord.MidiNote + ((float)_tracker.CurrentPitchRecord.MidiCents/100f);
 		}
 
 		public float lastFrequency(int buffer=0) {
-			return tracker.CurrentPitchRecord.Pitch;
+			return _tracker.CurrentPitchRecord.Pitch;
 		}
 
 		public string lastNote(int buffer=0) {
-			return PitchDsp.GetNoteName (tracker.CurrentPitchRecord.MidiNote,true,true);
+			return PitchDsp.GetNoteName (_tracker.CurrentPitchRecord.MidiNote,true,true);
 		}
 
 		public string midiNoteToString(int note) {
@@ -62,10 +62,10 @@ namespace PitchDetector
 
 		int repetitions(int element, int count) {
 			int rep = 0;
-			PitchTracker.PitchRecord refer=(PitchTracker.PitchRecord)tracker.PitchRecords[element];
+			PitchTracker.PitchRecord refer=(PitchTracker.PitchRecord)_tracker.PitchRecords[element];
 			int tester=refer.MidiNote;
-			for (int i=tracker.PitchRecordHistorySize-count; i<tracker.PitchRecordHistorySize; i++) {
-				PitchTracker.PitchRecord rec=(PitchTracker.PitchRecord)tracker.PitchRecords[i];
+			for (int i=_tracker.PitchRecordHistorySize-count; i<_tracker.PitchRecordHistorySize; i++) {
+				PitchTracker.PitchRecord rec=(PitchTracker.PitchRecord)_tracker.PitchRecords[i];
 				if(rec.MidiNote==tester)
 					rep++;
 			}

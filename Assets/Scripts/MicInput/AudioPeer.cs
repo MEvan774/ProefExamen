@@ -9,7 +9,7 @@ using UnityEngine.Audio;
 [RequireComponent (typeof (AudioSource))]
 public class AudioPeer : MonoBehaviour {
 
-	public bool ListenToAudioListener;
+	public bool IsListeningToAudioListener;
 
 	private AudioSource _audioSource;
 
@@ -25,7 +25,7 @@ public class AudioPeer : MonoBehaviour {
 
 	//audio band values
 	[HideInInspector]
-	public static float[] _audioBand, _audioBandBuffer;
+	public static float[] AudioBands, AudioBandBuffers;
 
 
 	//Amplitude variables
@@ -42,7 +42,7 @@ public class AudioPeer : MonoBehaviour {
 
 
 
-	public static bool  _resetAudioProfile;
+	public static bool  IsResettingAudioProfile;
 
 
 
@@ -54,8 +54,8 @@ public class AudioPeer : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		_audioBand = new float[8];
-		_audioBandBuffer = new float[8];
+		AudioBands = new float[8];
+		AudioBandBuffers = new float[8];
 
 
 		_audioSource = GetComponent<AudioSource> ();
@@ -91,8 +91,8 @@ public class AudioPeer : MonoBehaviour {
 		float _CurrentAmplitude = 0;
 		float _CurrentAmplitudeBuffer = 0;
 		for (int i = 0; i < 8; i++) {
-			_CurrentAmplitude += _audioBand [i];
-			_CurrentAmplitudeBuffer += _audioBandBuffer [i];
+			_CurrentAmplitude += AudioBands[i];
+			_CurrentAmplitudeBuffer += AudioBandBuffers[i];
 		}
 		if (_CurrentAmplitude > _amplitudeHighest) {
 			_amplitudeHighest = _CurrentAmplitude;
@@ -108,8 +108,8 @@ public class AudioPeer : MonoBehaviour {
 			if (FreqBands [i] > _freqBandHighest [i]) {
 				_freqBandHighest [i] = FreqBands [i];
 			}
-			_audioBand [i] = Mathf.Clamp((FreqBands [i] / _freqBandHighest [i]), 0, 1);
-			_audioBandBuffer [i] = Mathf.Clamp((_bandBuffer [i] / _freqBandHighest [i]), 0, 1);
+			AudioBands[i] = Mathf.Clamp((FreqBands [i] / _freqBandHighest [i]), 0, 1);
+			AudioBandBuffers[i] = Mathf.Clamp((_bandBuffer [i] / _freqBandHighest [i]), 0, 1);
 		}
 	}
 
@@ -117,11 +117,11 @@ public class AudioPeer : MonoBehaviour {
 
 	void GetSpectrumAudioSource()
 	{
-		if (ListenToAudioListener) {
+		if (IsListeningToAudioListener) {
 			AudioListener.GetSpectrumData (_samplesLeft, 0, FFTWindow.Hanning);
 			AudioListener.GetSpectrumData (_samplesRight, 1, FFTWindow.Hanning);
 		}
-		if (!ListenToAudioListener) {
+		if (!IsListeningToAudioListener) {
 			_audioSource.GetSpectrumData (_samplesLeft, 0, FFTWindow.Hanning);
 			_audioSource.GetSpectrumData (_samplesRight, 1, FFTWindow.Hanning);
 		}
