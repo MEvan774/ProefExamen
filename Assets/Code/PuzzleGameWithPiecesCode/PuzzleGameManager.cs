@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class PuzzleGameManager : MonoBehaviour
 {
-    [HideInInspector] public int correctplaced;
+    [HideInInspector] public int CorrectplacedPieces;
 
     public void OnCorrectPlaced()
     {
-        correctplaced++;
+        CorrectplacedPieces++;
 
-        if(correctplaced >= 9)
+        if(CorrectplacedPieces >= 9)
             OnPuzzleCompleted();
     }
 
     void OnPuzzleCompleted()
     {
-        Debug.Log("PuzzleCompleted!");// Dispatch event
+        //Dispatches event when puzzle is completed
     }
 }

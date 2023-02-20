@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class Slot : MonoBehaviour, IDropHandler
 {
-    [SerializeField] private PuzzleGameManager _manager;
-    [SerializeField] private int _slotID;
+    [SerializeField] private int slotID;
+    [SerializeField] private PuzzleGameManager manager;
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -15,15 +15,15 @@ public class Slot : MonoBehaviour, IDropHandler
             eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
             PuzzlePiece currentPiece = eventData.pointerDrag.GetComponent<PuzzlePiece>();
 
-            if (_slotID == currentPiece.dragID && !currentPiece.isCorrectPosition)
+            if (slotID == currentPiece.dragID && !currentPiece.IsCorrectPosition)
             {
-                currentPiece.isCorrectPosition = true;
-                _manager.OnCorrectPlaced();
+                currentPiece.IsCorrectPosition = true;
+                manager.OnCorrectPlaced();
             }
-            else if(_slotID != currentPiece.dragID && currentPiece.isCorrectPosition)
+            else if(slotID != currentPiece.dragID && currentPiece.IsCorrectPosition)
             {
-                currentPiece.isCorrectPosition = false;
-                _manager.correctplaced--;
+                currentPiece.IsCorrectPosition = false;
+                manager.CorrectplacedPieces--;
             }
 
         }
