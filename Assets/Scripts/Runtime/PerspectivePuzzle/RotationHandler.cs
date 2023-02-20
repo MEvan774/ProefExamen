@@ -65,7 +65,7 @@ public class RotationHandler : MonoBehaviour
     // Function that fires after the hologram matched the desired rotation range
     private void OnMatched()
     {
-        this.transform.rotation = targetTransform.rotation;
+        transform.rotation = targetTransform.rotation;
         StartCoroutine(DelayedTask(waitingTime, RotateAnimation));
     }
 
