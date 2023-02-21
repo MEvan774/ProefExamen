@@ -7,13 +7,12 @@ using System;
 public class RotationHandler : MonoBehaviour
 {
     // Minimum and maximum values for the Y rotation of the object
-    [SerializeField, Range(0, 1)] private float tolerance;
+    [SerializeField, Range(0, 10)] private float tolerance;
     [SerializeField] private bool isTargetZero;
-    [SerializeField] Transform targetTransform;
+    [SerializeField] private Transform targetTransform;
 
     // Values for lerp
     [SerializeField] private float waitingTime = 3;
-    [SerializeField] private Animator animations;
 
     // Event that is invoked when the object rotations is within the desired range
     public UnityEvent RotationMatched = new UnityEvent();
@@ -30,7 +29,7 @@ public class RotationHandler : MonoBehaviour
     {
         float targetY = targetTransform.rotation.eulerAngles.y;
         float rnd = Random.Range(targetY + 20, targetY + 340);
-        StartCoroutine(Lerp(rnd, 3));
+        StartCoroutine(Lerp(rnd, waitingTime));
     }
 
     IEnumerator Lerp(float endValue, float lerpDuration)
@@ -56,10 +55,12 @@ public class RotationHandler : MonoBehaviour
         Vector3 currentForward = transform.forward;
         Vector3 targetForward = targetTransform.forward;
         float accuracy = Vector3.Dot(currentForward, targetForward);
-        if (accuracy >= 1 - tolerance)
+        if (accuracy >= 20 - tolerance)
         {
             RotationMatched.Invoke();
         }
+
+        print("rotated");
     }
 
     // Function that fires after the hologram matched the desired rotation range
@@ -67,6 +68,7 @@ public class RotationHandler : MonoBehaviour
     {
         transform.rotation = targetTransform.rotation;
         StartCoroutine(DelayedTask(waitingTime, RotateAnimation));
+        print("matched");
     }
 
     IEnumerator DelayedTask(float delay, Action action)

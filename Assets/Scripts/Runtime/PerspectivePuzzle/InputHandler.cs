@@ -4,52 +4,48 @@ using UnityEngine;
 
 public class InputHandler : MonoBehaviour
 {
-    private Vector3 _position;
-    private float _width;
-    private float _height;
+    [SerializeField] private Camera cam;
+    [SerializeField] private RotationHandler rotationHandler;
 
-    void Awake()
+    private readonly float _pcRotationSpeed = 10f;
+    private readonly float _mobileRotationSpeed = 1f;
+    private readonly float _maxDistance = 10f;
+    private readonly float _zAngle = 0f;
+
+    private void OnMouseDrag()
     {
-        _width = (float)Screen.width / 2.0f;
-        _height = (float)Screen.height / 2.0f;
+        float xRotation = Input.GetAxis("Mouse X") * _pcRotationSpeed;
+        float yRotation = Input.GetAxis("Mouse Y") * _pcRotationSpeed;
 
-        // Position used for the cube.
-        _position = new Vector3(0.0f, 0.0f, 0.0f);
+        Vector3 right = Vector3.Cross(cam.transform.up, transform.position - cam.transform.position);
+        Vector3 up = Vector3.Cross(transform.position - cam.transform.position, right);
+
+        transform.rotation = Quaternion.AngleAxis(-xRotation, up) * transform.rotation;
+        transform.rotation = Quaternion.AngleAxis(yRotation, right) * transform.rotation;
+
+        //rotationHandler.OnRotated();
     }
 
-    void Update()
+    private void Update()
     {
-        // Handle screen touches.
-        if (Input.touchCount > 0)
+        foreach (Touch touch in Input.touches) 
         {
-            Touch touch = Input.GetTouch(0);
-
-            // Move the cube if the screen has the finger moving.
-            if (touch.phase == TouchPhase.Moved)
+            Ray ray = cam.ScreenPointToRay(touch.position);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, _maxDistance))
             {
-                Vector2 pos = touch.position;
-                pos.x = (pos.x - _width) / _width;
-                pos.y = (pos.y - _height) / _height;
-                _position = new Vector3(-pos.x, pos.y, 0.0f);
-
-                // Position the cube.
-                transform.position = _position;
-            }
-
-            if (Input.touchCount == 2)
-            {
-                touch = Input.GetTouch(1);
-
                 if (touch.phase == TouchPhase.Began)
                 {
-                    // Halve the size of the cube.
-                    transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
+                    Debug.Log("TouchPhase.Began");
                 }
-
-                if (touch.phase == TouchPhase.Ended)
+                else if (touch.phase == TouchPhase.Moved) 
                 {
-                    // Restore the regular size of the cube.
-                    transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                    Debug.Log("TouchPhase.Moved");
+                    transform.Rotate(touch.deltaPosition.y * _mobileRotationSpeed, -touch.deltaPosition.x * _mobileRotationSpeed, _zAngle, Space.World);
+                }
+                else if (touch.phase == TouchPhase.Ended)
+                {
+                    Debug.Log("TouchPhase.Ended");
                 }
             }
         }
