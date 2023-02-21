@@ -111,11 +111,33 @@ public class GpsManager : MonoBehaviour
         StopGPS();
     }
 
-    public float DistanceBetween2Points(float latitude1, float latitude2, float longitude1, float longitude2)
+    //Function uses a double because casting to float is a bit innefficient
+    public static double Distance(double lat1, double lon1, double lat2, double lon2)
     {
-        float distance = Mathf.Acos(Mathf.Sin(latitude1) * Mathf.Sin(latitude2) + Mathf.Cos(latitude1) * Mathf.Cos(longitude2 - longitude1)) * 6371;
+        const double R = 6371.0; // Earth's radius in kilometers
+
+        var dLat = ToRadians(lat2 - lat1);
+        var dLon = ToRadians(lon2 - lon1);
+
+        var a = Mathf.Sin((float)(dLat / 2)) * Mathf.Sin((float)(dLat / 2)) +
+                Mathf.Cos((float)ToRadians(lat1)) * Mathf.Cos((float)ToRadians(lat2)) *
+                Mathf.Sin((float)(dLon / 2)) * Mathf.Sin((float)(dLon / 2));
+
+        var c = 2 * Mathf.Atan2(Mathf.Sqrt((float)a), Mathf.Sqrt((float)(1 - a)));
+        var distance = R * c;
+
         return distance;
     }
 
+    public static double ToRadians(double degrees)
+    {
+        //degrees converted to radians
+        return degrees * Mathf.PI / 180;
+    }
+
+    private void Update()
+    {
+        Debug.Log(Distance(52.35989600952385, 4.8004249229028995,52.37161765521246,4.8963318838090375));
+    }
 }
 
