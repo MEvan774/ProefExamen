@@ -139,17 +139,6 @@ public class GpsManager : MonoBehaviour
 
     public double Distance(double lat1, double lon1, double lat2, double lon2)
     {
-<<<<<<< Updated upstream:Assets/Scripts/GPS/GpsManager.cs
-        StopGPS();
-    }
-
-    public float DistanceBetween2Points(float latitude1, float latitude2, float longitude1, float longitude2)
-    {
-        float distance = Mathf.Acos(Mathf.Sin(latitude1) * Mathf.Sin(latitude2) + Mathf.Cos(latitude1) * Mathf.Cos(longitude2 - longitude1)) * 6371;
-        return distance;
-    }
-
-=======
         const double radius = 6371.0; // Earth's radius in kilometers
 
         var dLat = ToRadians(lat2 - lat1);
@@ -180,6 +169,5 @@ public class GpsManager : MonoBehaviour
         Input.location.Stop();
         StopCoroutine(_coroutine);
     }
->>>>>>> Stashed changes:Assets/Scripts/Runtime/GPS/GpsManager.cs
 }
 
