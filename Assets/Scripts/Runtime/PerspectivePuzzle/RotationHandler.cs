@@ -24,7 +24,6 @@ public class RotationHandler : MonoBehaviour
 
     private void Start()
     {
-        //RotationMatched.AddListener(OnMatched);
         RotateAnimation();
     }
 
