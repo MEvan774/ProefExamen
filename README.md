@@ -1,10 +1,10 @@
 ## Dev Team:
-- Milan Breuren (SCRUM Master)
-- Nanne Veldhuijzen van Zanten
-- Zakaria el Ghoul Aadi (Dev Lead)
+- Milan Breuren (Product Owner)
+- Nanne Veldhuijzen van Zanten (SCRUM Master)
+- Zakaria El Ghoul Aadi (Dev Lead)
 
 ## Art Team:
-- Isa Schulte
+- Isa Schulte (Notulist)
 - Jesper Ceria
 - Lennard Hartog (Art Lead)
 - Yessie Blaas
