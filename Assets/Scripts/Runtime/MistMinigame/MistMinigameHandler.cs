@@ -27,8 +27,6 @@ public class MistMinigameHandler : MonoBehaviour
         {
             _mistAmount -= (Time.deltaTime / 10);
             _mistRenderer.material.SetFloat("_Alpha", _mistAmount);
-
-            Debug.Log("mistAmount = " + _mistAmount);
         }
         if (_mistAmount < 0.05f && _isLookingAt && !_isGameClear)
         {
@@ -45,12 +43,10 @@ public class MistMinigameHandler : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         _isLookingAt = true;
-        Debug.Log("ISLOOKING AT!!!!!!!!!!!");
     }
 
     private void OnTriggerExit(Collider other)
     {
         _isLookingAt = false;
-        Debug.Log("IS !NOT! LOOKING AT!!!!!!!!!!!");
     }
 }
