@@ -24,7 +24,7 @@ public class RotationHandler : MonoBehaviour
 
     private void Start()
     {
-        RotationMatched.AddListener(OnMatched);
+        //RotationMatched.AddListener(OnMatched);
         RotateAnimation();
     }
 
@@ -60,14 +60,16 @@ public class RotationHandler : MonoBehaviour
         float accuracy = Vector3.Dot(currentForward, targetForward);
         if (accuracy >= 1f - tolerance)
         {
-            transform.rotation = targetTransform.rotation;
             StartCoroutine(WaitForCompletion());
         }
     }
 
     IEnumerator WaitForCompletion()
     {
+        OnMatched();
+
         yield return new WaitForSeconds(2f);
+
         RotationMatched.Invoke();
     }
 
