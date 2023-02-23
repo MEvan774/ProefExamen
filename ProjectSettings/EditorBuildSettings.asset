@@ -15,11 +15,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Minigames/Run_Minigame.unity
     guid: fdb5d7e1b6ea22e4c8f216af025dbcc7
   - enabled: 1
-    path: Assets/Scenes/Minigames/Puzzle_Minigame.unity
-    guid: ed2f28d9285ba394298ff1ef77713298
-  - enabled: 1
     path: Assets/Scenes/Minigames/Mist_Minigame.unity
     guid: f965f1fe3789e7d4b8a6df73115f40cc
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Puzzle_Minigame.unity
+    guid: ed2f28d9285ba394298ff1ef77713298
   - enabled: 1
     path: Assets/Scenes/Minigames/PerspectivePuzzle_Minigame.unity
     guid: 1b5968ed8800b194e833cc0ec08951b5
