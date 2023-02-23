@@ -1,21 +1,30 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Android;
+using TMPro;
+using System;
 
 public class GpsManager : MonoBehaviour
 {
     [HideInInspector] public float latitude;
     [HideInInspector] public float longitude;
+    [HideInInspector] public float startLatitude;
+    [HideInInspector] public float startLongitude;
+    [HideInInspector] public Decimal distance;
 
-    public Text[] texts;
+    public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
 
+    
     void Awake()
     {
         StartCoroutine(AskPermission());
+
+        for (int i = 0; i < texts.Length; i++)
+        {
+            texts[i].text = "DEBUG DEBUG";
+        }
     }
 
     IEnumerator AskPermission()
@@ -31,19 +40,11 @@ public class GpsManager : MonoBehaviour
 
         PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
         //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
-        _permissionCallbacks.PermissionGranted += s =>
-        {
-            InvokeRepeating("StartGPS", 1f, 2f);
-        };
+        _permissionCallbacks.PermissionGranted += s =>{};
 
-        _permissionCallbacks.PermissionDenied += s => 
-        {
-        };
+        _permissionCallbacks.PermissionDenied += s =>{};
 
-        _permissionCallbacks.PermissionDeniedAndDontAskAgain += s => 
-        {
-            InvokeRepeating("StartGPS", 1f, 2f);
-        };
+        _permissionCallbacks.PermissionDeniedAndDontAskAgain += s =>{};
 
         Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
     }
@@ -57,7 +58,7 @@ public class GpsManager : MonoBehaviour
 
         Input.location.Start();
 
-        int maxWait = 20;
+        int maxWait = 3;
         while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
         {
             yield return new WaitForSeconds(1);
@@ -66,21 +67,26 @@ public class GpsManager : MonoBehaviour
 
         if (maxWait < 1)
         {
-            print("Timed out");
+            for (int i = 0; i < texts.Length; i++)
+            {
+            texts[i].text = "Timed out.";
+            }
             yield break;
         }
 
 
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            print("Unable to determine device location");
+            for (int i = 0; i < texts.Length; i++)
+            {
+                texts[i].text = "Unable to determine device location";
+            }
             yield break;
         }
         else
         {
-            print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-            longitude = Input.location.lastData.longitude;
-            latitude = Input.location.lastData.latitude;
+            startLongitude = Input.location.lastData.longitude;
+            startLatitude = Input.location.lastData.latitude;
             StartCoroutine(_coroutine);
         }
     }
@@ -90,24 +96,50 @@ public class GpsManager : MonoBehaviour
         float timeForUpdate = 3f; //Every  3 seconds
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
+        //Store the values to a temp variables  
+        decimal _distance = 0;
+        double prevLongitude = 0;
+        double prevLatitude = 0;
+
         while (true)
         {
-            texts[0].text = "Latitude = " + latitude.ToString();
-            texts[1].text = "Longitude = " + longitude.ToString();
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
+
+            texts[0].text = "Start Latitude = " + startLatitude.ToString();
+            texts[1].text = "Start Longitude = " + startLongitude.ToString();
+
+            texts[2].text = "Latitude = " + latitude.ToString();
+            texts[3].text = "Longitude = " + longitude.ToString();
+
+            if (prevLongitude != 0 && prevLatitude != 0)
+            {
+                double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
+                _distance += (decimal)dist;
+                texts[4].text = "Distance = " + _distance.ToString() + " km";
+                Debug.Log(longitude);
+                Debug.Log(latitude);
+                Debug.Log(dist);
+                Debug.Log(_distance);
+            }
+
+            prevLongitude = longitude;
+            prevLatitude = latitude;
+
             yield return updateTime;
         }
     }
 
-    void StopGPS()
-    {
-        Input.location.Stop();
-        StopCoroutine(_coroutine);
-    }
+    /*
+        Function uses a double because casting to float is a bit innefficient
+        The haversine formula determines the great-circle distance between two points on a sphere given their longitudes and latitudes. 
+        Important in navigation, it is a special case of a more general formula in spherical trigonometry, the law of haversines, that relates the sides and angles of spherical triangles.
+        //Reference for the formula https://en.wikipedia.org/wiki/Haversine_formula
+    */
 
-    void OnDisable()
+    public double Distance(double lat1, double lon1, double lat2, double lon2)
     {
+<<<<<<< Updated upstream:Assets/Scripts/GPS/GpsManager.cs
         StopGPS();
     }
 
@@ -117,5 +149,37 @@ public class GpsManager : MonoBehaviour
         return distance;
     }
 
+=======
+        const double radius = 6371.0; // Earth's radius in kilometers
+
+        var dLat = ToRadians(lat2 - lat1);
+        var dLon = ToRadians(lon2 - lon1);
+
+        var a = Mathf.Sin((float)(dLat / 2)) * Mathf.Sin((float)(dLat / 2)) +
+                Mathf.Cos((float)ToRadians(lat1)) * Mathf.Cos((float)ToRadians(lat2)) *
+                Mathf.Sin((float)(dLon / 2)) * Mathf.Sin((float)(dLon / 2));
+
+        var c = 2 * Mathf.Atan2(Mathf.Sqrt((float)a), Mathf.Sqrt((float)(1 - a)));
+
+        var distance = radius * c;
+
+        return distance;
+    }
+
+    public double ToRadians(double degrees)
+    {
+        //degrees converted to radians
+        return degrees * Mathf.PI / 180;
+    }
+    private void OnDisable()
+    {
+        StopGPS();
+    }
+    public void StopGPS()
+    {
+        Input.location.Stop();
+        StopCoroutine(_coroutine);
+    }
+>>>>>>> Stashed changes:Assets/Scripts/Runtime/GPS/GpsManager.cs
 }
 
