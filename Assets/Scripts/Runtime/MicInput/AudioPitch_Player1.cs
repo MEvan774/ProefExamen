@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using PitchDetector;
+using UnityEngine.Android;
 
 public class AudioPitch_Player1 : MonoBehaviour {
 
@@ -52,15 +53,11 @@ public class AudioPitch_Player1 : MonoBehaviour {
 
 
 
-	void Start () {
-		GetMic();
+    void Start () {
+        StartCoroutine(AskPermission());
+    }
 
-		//InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
-
-		StartCoroutine(RepeatUnscaledTime());
-	}
-
-	public void GetMic()
+    public void GetMic()
     {
 		SelectedDevice = Microphone.devices[MicInput].ToString();
 		SelectedMic = SelectedDevice;
@@ -85,6 +82,8 @@ public class AudioPitch_Player1 : MonoBehaviour {
 			elapsedTime += Time.unscaledDeltaTime;
 			yield return null;
 		}
+
+		Debug.Log("PItch = " + CurrentPublicPitch);
 
 		ListenAudioInput();
 		StartCoroutine(RepeatUnscaledTime());
@@ -186,4 +185,37 @@ public class AudioPitch_Player1 : MonoBehaviour {
 		}
 		return moda;
 	}
+    IEnumerator AskPermission()
+    {
+        //handle permission
+        bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+
+        //WE HAVE PERMISSION SO WE CAN START THE SERVICE
+        if (_hasMicrophonePermission)
+        {
+            yield break;
+        }
+
+        PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+        //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
+        _permissionCallbacks.PermissionGranted += s => {
+            GetMic();
+
+            //InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
+
+            StartCoroutine(RepeatUnscaledTime());
+        };
+
+        _permissionCallbacks.PermissionDenied += s => { };
+
+        _permissionCallbacks.PermissionDeniedAndDontAskAgain += s => {
+            GetMic();
+
+            //InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
+
+            StartCoroutine(RepeatUnscaledTime());
+        };
+
+        Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
+    }
 }
