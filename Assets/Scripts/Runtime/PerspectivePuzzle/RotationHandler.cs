@@ -82,7 +82,6 @@ public class RotationHandler : MonoBehaviour
             puzzleInComplete.SetActive(false);
 
             puzzleComplete.SetActive(true);
-            print("matched");
 
             _isFinished = true;
         }
