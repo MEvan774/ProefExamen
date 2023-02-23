@@ -8,9 +8,14 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private RotationHandler rotationHandler;
 
     private readonly float _pcRotationSpeed = 10f;
-    private readonly float _mobileRotationSpeed = 1f;
+    private readonly float _mobileRotationSpeed = 0.5f;
     private readonly float _maxDistance = 10f;
     private readonly float _zAngle = 0f;
+
+    private void Awake()
+    {
+        cam = Camera.main;
+    }
 
     private void OnMouseDrag()
     {
@@ -23,7 +28,7 @@ public class InputHandler : MonoBehaviour
         transform.rotation = Quaternion.AngleAxis(-xRotation, up) * transform.rotation;
         transform.rotation = Quaternion.AngleAxis(yRotation, right) * transform.rotation;
 
-        //rotationHandler.OnRotated();
+        rotationHandler.OnRotated();
     }
 
     private void Update()
@@ -38,10 +43,11 @@ public class InputHandler : MonoBehaviour
                 {
                     Debug.Log("TouchPhase.Began");
                 }
-                else if (touch.phase == TouchPhase.Moved) 
+                else if (touch.phase == TouchPhase.Moved)
                 {
                     Debug.Log("TouchPhase.Moved");
                     transform.Rotate(touch.deltaPosition.y * _mobileRotationSpeed, -touch.deltaPosition.x * _mobileRotationSpeed, _zAngle, Space.World);
+                    rotationHandler.OnRotated();
                 }
                 else if (touch.phase == TouchPhase.Ended)
                 {

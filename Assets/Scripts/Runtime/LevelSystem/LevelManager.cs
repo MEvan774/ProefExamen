@@ -5,21 +5,22 @@ using UnityEngine.SceneManagement;
 
 namespace Runtime.LevelSystem
 {
-    //[RequireComponent(typeof(AudioSource))]
     public class LevelManager : MonoBehaviour
     {
         [SerializeField] private List<int> levelBuildIndexes;
-        //[SerializeField] private AudioClip levelComplete;
+        [SerializeField] private GameObject[] nonDestoyableObjects;
 
         private int _currentLevel = -1;
         private CompletableBehaviour[] _completableBehaviours;
-        //private AudioSource _audioSource;
 
         private void Awake()
         {
             CurrentLevel = 0;
-            //_audioSource = gameObject.GetComponent<AudioSource>();
-            //_audioSource.clip = levelComplete;
+
+            for (int i = 0; i < nonDestoyableObjects.Length; i++)
+            {
+                DontDestroyOnLoad(nonDestoyableObjects[i]);
+            }
         }
 
         public void ForceNextLevel()
@@ -29,7 +30,6 @@ namespace Runtime.LevelSystem
 
         private void NextLevel()
         {
-            //_audioSource.PlayOneShot(levelComplete);
             CurrentLevel += 1;
         }
 
