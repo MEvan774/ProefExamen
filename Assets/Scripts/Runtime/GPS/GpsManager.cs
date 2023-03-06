@@ -117,10 +117,6 @@ public class GpsManager : MonoBehaviour
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + _distance.ToString() + " km";
-                Debug.Log(longitude);
-                Debug.Log(latitude);
-                Debug.Log(dist);
-                Debug.Log(_distance);
             }
 
             prevLongitude = longitude;
