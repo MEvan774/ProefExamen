@@ -3,6 +3,14 @@ using UnityEngine;
 using UnityEngine.Android;
 using TMPro;
 using System;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class Checkpoint
+{
+    public float Latitude;
+    public float Longitude;
+}
 
 public class GpsManager : MonoBehaviour
 {
@@ -16,7 +24,12 @@ public class GpsManager : MonoBehaviour
 
     private IEnumerator _coroutine;
 
+    Checkpoint checkpoint = new Checkpoint();
+
+    public GameObject checkPointObj;
     
+    public List<Checkpoint> checkpoints = new List<Checkpoint>();
+
     void Awake()
     {
         StartCoroutine(AskPermission());
@@ -112,15 +125,15 @@ public class GpsManager : MonoBehaviour
             texts[2].text = "Latitude = " + latitude.ToString();
             texts[3].text = "Longitude = " + longitude.ToString();
 
+            checkpoint.Latitude = latitude;
+            checkpoint.Longitude = longitude;
+
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + _distance.ToString() + " km";
-                Debug.Log(longitude);
-                Debug.Log(latitude);
-                Debug.Log(dist);
-                Debug.Log(_distance);
+                
             }
 
             prevLongitude = longitude;
@@ -169,5 +182,18 @@ public class GpsManager : MonoBehaviour
         Input.location.Stop();
         StopCoroutine(_coroutine);
     }
+
+    public void AddCheckPoints()
+    {
+        checkpoints.Add(checkpoint);
+        Instantiate(checkPointObj, GameObject.Find("CheckPointLayout").gameObject.transform);
+    }
+
+    public void RemoveCheckPoints()
+    {
+        checkpoints.RemoveAt(checkpoints.Count - 1);
+        Destroy(GameObject.Find("CheckPointLayout").gameObject.transform.GetChild(checkpoints.Count).gameObject);
+    }
 }
+
 
