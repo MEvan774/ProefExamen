@@ -499,6 +499,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4961613047614354928, guid: cd961310a31d09e4f929847e90ed04d8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -2375384928575130099, guid: cd961310a31d09e4f929847e90ed04d8,
         type: 3}
       propertyPath: m_Layer
@@ -542,54 +547,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 463204986}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &463204988 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -4961613047614354928, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204989 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -5302647975081204596, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204990 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -2375384928575130099, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204991 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6744490012706483633, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204992 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -1587040813682354286, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204993 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3927652368253602066, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204994 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -657711776218495122, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &463204995 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -46954384089309621, guid: cd961310a31d09e4f929847e90ed04d8,
-    type: 3}
-  m_PrefabInstance: {fileID: 463204986}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1104195166
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,18 +582,8 @@ MonoBehaviour:
   tolerance: 0.001
   isTargetZero: 0
   targetTransform: {fileID: 27801007}
-  puzzleComplete: {fileID: 463204989}
-  puzzleInComplete: {fileID: 463204988}
-  cam: {fileID: 0}
   collisionCheck: {fileID: 27801010}
   waitingTime: 3
-  deerObjects:
-  - {fileID: 463204995}
-  - {fileID: 463204994}
-  - {fileID: 463204993}
-  - {fileID: 463204992}
-  - {fileID: 463204991}
-  - {fileID: 463204990}
   RotationMatched:
     m_PersistentCalls:
       m_Calls:
