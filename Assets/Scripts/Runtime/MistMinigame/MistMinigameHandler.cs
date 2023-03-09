@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class MistMinigameHandler : MonoBehaviour
 {
     [SerializeField] private AudioPitch_Player1 _audioInput;
+    [SerializeField] private UnityEvent onMistGameCompleted;
 
     private MeshRenderer _mistRenderer;
 
@@ -37,7 +39,7 @@ public class MistMinigameHandler : MonoBehaviour
 
     void OnMinigameClear()
     {
-
+        onMistGameCompleted.Invoke();
     }
 
     private void OnTriggerEnter(Collider other)

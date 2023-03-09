@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Rotatable
   - Camera
+  - CheckPointLayout
   layers:
   - Default
   - TransparentFX
