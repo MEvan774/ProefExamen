@@ -60,6 +60,7 @@ public class GpsManager : MonoBehaviour
         _permissionCallbacks.PermissionDeniedAndDontAskAgain += s =>{};
 
         Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
+
     }
 
     IEnumerator Start()
@@ -132,8 +133,7 @@ public class GpsManager : MonoBehaviour
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
                 _distance += (decimal)dist;
-                texts[4].text = "Distance = " + _distance.ToString() + " km";
-                
+                texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
             }
 
             prevLongitude = longitude;
@@ -186,13 +186,23 @@ public class GpsManager : MonoBehaviour
     public void AddCheckPoints()
     {
         checkpoints.Add(checkpoint);
-        Instantiate(checkPointObj, GameObject.Find("CheckPointLayout").gameObject.transform);
+
+        var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
+        tempCheckPointObj.GetComponent<TMP_Text>().text = "CheckPoint " + checkpoints.Count + "\n" + "Latitude = " + checkpoint.Latitude.ToString() + "\n" + "Longitude = " + checkpoint.Longitude.ToString();
     }
 
     public void RemoveCheckPoints()
     {
         checkpoints.RemoveAt(checkpoints.Count - 1);
-        Destroy(GameObject.Find("CheckPointLayout").gameObject.transform.GetChild(checkpoints.Count).gameObject);
+
+        Destroy(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(checkpoints.Count).gameObject);
+    }
+
+    public void RemoveCheckPointsAtLocation()
+    {
+        checkpoints.RemoveAt(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex());
+
+        Destroy(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject);
     }
 }
 
