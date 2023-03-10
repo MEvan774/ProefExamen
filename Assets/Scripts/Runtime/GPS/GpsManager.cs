@@ -107,7 +107,7 @@ public class GpsManager : MonoBehaviour
 
     IEnumerator UpdateGPS()
     {
-        float timeForUpdate = 3f; //Every  3 seconds
+        float timeForUpdate = 1f; //Every X seconds
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
@@ -188,6 +188,7 @@ public class GpsManager : MonoBehaviour
         checkpoints.Add(checkpoint);
 
         var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
+
         tempCheckPointObj.GetComponent<TMP_Text>().text = "CheckPoint " + checkpoints.Count + "\n" + "Latitude = " + checkpoint.Latitude.ToString() + "\n" + "Longitude = " + checkpoint.Longitude.ToString();
     }
 
@@ -200,10 +201,16 @@ public class GpsManager : MonoBehaviour
 
     public void RemoveCheckPointsAtLocation()
     {
-        checkpoints.RemoveAt(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex());
 
-        Destroy(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject);
+        int index = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex();
+
+        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject; 
+
+        checkpoints.RemoveAt(index);
+
+        Destroy(objToDestroyAt);
     }
+
 }
 
 
