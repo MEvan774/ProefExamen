@@ -342,8 +342,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6607305ef7615a4fbf6cc55d0bc2ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelBuildIndexes: 010000000200000003000000020000000400000002000000050000000200000006000000
-  nonDestroyableObjects: []
+  levelBuildIndexes: 010000000200000003000000040000000500000006000000
+  nonDestroyableObjects:
+  - {fileID: 1659859597}
+  - {fileID: 656880745}
   shaderImage: {fileID: 2072839823}
 --- !u!1 &1354141925
 GameObject:
@@ -642,7 +644,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 1
   m_TargetDisplay: 0

@@ -17,7 +17,11 @@ namespace Runtime.LevelSystem
         private const float _zero = 0f;
 
         private bool _doTransition;
+        private bool _minigameCompleted;
+
         private int _currentLevel = -1;
+        private int _homePageLevel = 1;
+
         private CompletableBehaviour[] _completableBehaviours;
 
         private void Awake()
@@ -40,6 +44,9 @@ namespace Runtime.LevelSystem
                 float progress = Mathf.PingPong(_timer, 1f);
                 shaderImage.material.SetFloat("_Progress", progress);
             }
+
+            print(CurrentLevel);
+            print(_minigameCompleted);
         }
 
         IEnumerator PlayTransition()
@@ -72,11 +79,16 @@ namespace Runtime.LevelSystem
             get => _currentLevel;
             set
             {
-                if (_currentLevel != -1)
+                if (_currentLevel != -1 && !_minigameCompleted)
                 {
                     AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
                     var newValue = value;
                     operation.completed += (_) => LoadNextLevel(newValue);
+                }
+                else if (_currentLevel != -1 && _minigameCompleted)
+                {
+                    AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
+                    operation.completed += (_) => LoadMainMenu();
                 }
                 else
                 {
@@ -92,6 +104,13 @@ namespace Runtime.LevelSystem
             _currentLevel = newLevelIndex;
         }
 
+        private void LoadMainMenu()
+        {
+            AsyncOperation async = SceneManager.LoadSceneAsync("HomePage", LoadSceneMode.Additive);
+            async.completed += OnLevelLoaded;
+            _currentLevel += _homePageLevel;
+        }
+
         private void OnLevelLoaded(AsyncOperation operation)
         {
             _completableBehaviours = FindObjectsOfType<CompletableBehaviour>(true);
@@ -104,7 +123,11 @@ namespace Runtime.LevelSystem
 
         private void HandleCompletableComplete()
         {
-            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted)) return;
+            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted))
+            {
+                return;
+            }
+            _minigameCompleted = true;
 
             StartCoroutine(PlayTransition());
         }
