@@ -23,7 +23,7 @@ public class Slot : MonoBehaviour, IDropHandler
             else if(slotID != currentPiece.dragID && currentPiece.IsCorrectPosition)
             {
                 currentPiece.IsCorrectPosition = false;
-                manager.CorrectplacedPieces--;
+                manager.correctPlacedPieces--;
             }
 
         }

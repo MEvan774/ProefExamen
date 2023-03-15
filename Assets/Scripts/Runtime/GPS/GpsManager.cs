@@ -3,6 +3,17 @@ using UnityEngine;
 using UnityEngine.Android;
 using TMPro;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
+[Serializable]
+public class Checkpoint
+{
+    public float Latitude;
+    public float Longitude;
+}
 
 public class GpsManager : MonoBehaviour
 {
@@ -17,7 +28,18 @@ public class GpsManager : MonoBehaviour
     public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
+<<<<<<< HEAD
     
+=======
+
+    Checkpoint checkpoint = new Checkpoint();
+
+    public GameObject checkPointObj;
+
+    [SerializeField]
+    public List<Checkpoint> checkpoints = new List<Checkpoint>();
+
+>>>>>>> develop
     void Awake()
     {
         StartCoroutine(AskPermission());
@@ -48,6 +70,7 @@ public class GpsManager : MonoBehaviour
         _permissionCallbacks.PermissionDeniedAndDontAskAgain += s =>{};
 
         Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
+
     }
 
     IEnumerator Start()
@@ -94,7 +117,11 @@ public class GpsManager : MonoBehaviour
 
     IEnumerator UpdateGPS()
     {
+<<<<<<< HEAD
         float timeForUpdate = 0.5f; //Every  3 seconds
+=======
+        float timeForUpdate = 1f; //Every X seconds
+>>>>>>> develop
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
@@ -114,15 +141,23 @@ public class GpsManager : MonoBehaviour
             texts[2].text = "Latitude = " + latitude.ToString();
             texts[3].text = "Longitude = " + longitude.ToString();
 
+            checkpoint.Latitude = latitude;
+            checkpoint.Longitude = longitude;
+
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
+<<<<<<< HEAD
                 Dist += (decimal)dist;
                 texts[4].text = "Distance = " + Dist.ToString() + " km";
                 Debug.Log(longitude);
                 Debug.Log(latitude);
                 Debug.Log(dist);
                 Debug.Log(Dist);
+=======
+                _distance += (decimal)dist;
+                texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+>>>>>>> develop
             }
 
             prevLongitude = longitude;
@@ -171,5 +206,82 @@ public class GpsManager : MonoBehaviour
         Input.location.Stop();
         StopCoroutine(_coroutine);
     }
+
+    public void AddCheckPoints()
+    {
+        checkpoints.Add(checkpoint);
+
+        var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
+
+        tempCheckPointObj.GetComponent<TMP_Text>().text = "CheckPoint " + checkpoints.Count + "\n" + "Latitude = " + checkpoint.Latitude.ToString() + "\n" + "Longitude = " + checkpoint.Longitude.ToString();
+    }
+
+    public void RemoveCheckPoints()
+    {
+        checkpoints.RemoveAt(checkpoints.Count - 1);
+
+        Destroy(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(checkpoints.Count).gameObject);
+    }
+
+    public void RemoveCheckPointsAtLocation()
+    {
+
+        int index = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex();
+
+        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject; 
+
+        checkpoints.RemoveAt(index);
+
+        Destroy(objToDestroyAt);
+    }
+
+    public void SaveCheckPoints()
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        formatter.Serialize(stream, checkpoints);
+        stream.Close();
+
+        Debug.Log("Saved Checkpoints at " + path);
+    }
+
+    public void LoadCheckPoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            List<Checkpoint> loadedCheckpoints = formatter.Deserialize(stream) as List<Checkpoint>;
+            stream.Close();
+
+            checkpoints = loadedCheckpoints;
+
+            Debug.Log("Loaded Checkpoints from " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
+
+    public void DeleteCheckpoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            checkpoints.Clear();
+            Debug.Log("Deleted Checkpoints at " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
 }
+
 

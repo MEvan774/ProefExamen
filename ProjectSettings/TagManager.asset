@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Rotatable
   - Camera
+  - CheckPointLayout
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Rotatable
   - Water
   - UI
   - 
