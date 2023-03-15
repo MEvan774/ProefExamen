@@ -22,5 +22,20 @@ public class GpsManagerEditor : UnityEditor.Editor
             if (!Application.isPlaying) return;
             if (gpsManager != null) gpsManager.RemoveCheckPoints();
         }
+        if (GUILayout.Button("Save Save"))
+        {
+            if (!Application.isPlaying) return;
+            if (gpsManager != null) gpsManager.SaveCheckPoints();
+        }
+        if (GUILayout.Button("Load Save"))
+        {
+            if (!Application.isPlaying) return;
+            if (gpsManager != null) gpsManager.LoadCheckPoints();
+        }
+        if (GUILayout.Button("Delete Save"))
+        {
+            if (!Application.isPlaying) return;
+            if (gpsManager != null) gpsManager.DeleteCheckpoints();
+        }
     }
 }

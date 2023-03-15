@@ -4,8 +4,11 @@ using UnityEngine.Android;
 using TMPro;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
-[System.Serializable]
+
+[Serializable]
 public class Checkpoint
 {
     public float Latitude;
@@ -20,16 +23,23 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
+    public decimal Dist;
+
     public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
+<<<<<<< HEAD
+    
+=======
 
     Checkpoint checkpoint = new Checkpoint();
 
     public GameObject checkPointObj;
-    
+
+    [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
 
+>>>>>>> develop
     void Awake()
     {
         StartCoroutine(AskPermission());
@@ -107,11 +117,16 @@ public class GpsManager : MonoBehaviour
 
     IEnumerator UpdateGPS()
     {
+<<<<<<< HEAD
+        float timeForUpdate = 0.5f; //Every  3 seconds
+=======
         float timeForUpdate = 1f; //Every X seconds
+>>>>>>> develop
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
-        decimal _distance = 0;
+        //decimal Dist = 0;
+        Dist = 0;
         double prevLongitude = 0;
         double prevLatitude = 0;
 
@@ -132,8 +147,17 @@ public class GpsManager : MonoBehaviour
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
+<<<<<<< HEAD
+                Dist += (decimal)dist;
+                texts[4].text = "Distance = " + Dist.ToString() + " km";
+                Debug.Log(longitude);
+                Debug.Log(latitude);
+                Debug.Log(dist);
+                Debug.Log(Dist);
+=======
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+>>>>>>> develop
             }
 
             prevLongitude = longitude;
@@ -211,6 +235,53 @@ public class GpsManager : MonoBehaviour
         Destroy(objToDestroyAt);
     }
 
+    public void SaveCheckPoints()
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        formatter.Serialize(stream, checkpoints);
+        stream.Close();
+
+        Debug.Log("Saved Checkpoints at " + path);
+    }
+
+    public void LoadCheckPoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            List<Checkpoint> loadedCheckpoints = formatter.Deserialize(stream) as List<Checkpoint>;
+            stream.Close();
+
+            checkpoints = loadedCheckpoints;
+
+            Debug.Log("Loaded Checkpoints from " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
+
+    public void DeleteCheckpoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            checkpoints.Clear();
+            Debug.Log("Deleted Checkpoints at " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
 }
 
 
