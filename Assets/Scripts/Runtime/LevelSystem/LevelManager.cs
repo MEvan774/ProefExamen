@@ -28,6 +28,8 @@ namespace Runtime.LevelSystem
         {
             shaderImage.material.shader = Shader.Find("Custom/DiamondMask");
 
+            shaderImage.material.SetFloat("_Progress", 0);
+
             CurrentLevel = 0;
 
             for (int i = 0; i < nonDestroyableObjects.Length; i++)

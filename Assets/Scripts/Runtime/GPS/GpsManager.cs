@@ -23,8 +23,6 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
-    public decimal _distance;
-
     public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
@@ -35,6 +33,8 @@ public class GpsManager : MonoBehaviour
 
     [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
+
+    public int playerIndex;
 
     void Awake()
     {
@@ -72,6 +72,7 @@ public class GpsManager : MonoBehaviour
     IEnumerator Start()
     {
         _coroutine = UpdateGPS();
+        LoadCheckPoints();
 
         if (!Input.location.isEnabledByUser)
             yield break;
@@ -114,12 +115,10 @@ public class GpsManager : MonoBehaviour
     IEnumerator UpdateGPS()
     {
         float timeForUpdate = 1f; //Every X seconds
-
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
-        //decimal Dist = 0;
-        _distance = 0;
+        decimal _distance = 0;
         double prevLongitude = 0;
         double prevLatitude = 0;
 
@@ -143,10 +142,24 @@ public class GpsManager : MonoBehaviour
 
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+                texts[5].text =  playerIndex + " " + Distance(latitude, longitude, checkpoints[playerIndex].Latitude, checkpoints[playerIndex].Longitude).ToString();
             }
 
             prevLongitude = longitude;
             prevLatitude = latitude;
+            if (checkpoints != null)
+            {
+                break;
+            }
+            if (Distance(latitude, longitude, checkpoints[playerIndex].Latitude, checkpoints[playerIndex].Longitude) == 0)
+            {
+                playerIndex++;
+                //event callen
+            }
+            if (playerIndex == checkpoints.Count) 
+            { 
+                playerIndex = 0;
+            }   
 
             yield return updateTime;
         }
@@ -158,7 +171,6 @@ public class GpsManager : MonoBehaviour
         Important in navigation, it is a special case of a more general formula in spherical trigonometry, the law of haversines, that relates the sides and angles of spherical triangles.
         //Reference for the formula https://en.wikipedia.org/wiki/Haversine_formula
     */
-
     public double Distance(double lat1, double lon1, double lat2, double lon2)
     {
         const double radius = 6371.0; // Earth's radius in kilometers
@@ -244,8 +256,14 @@ public class GpsManager : MonoBehaviour
             stream.Close();
 
             checkpoints = loadedCheckpoints;
-
             Debug.Log("Loaded Checkpoints from " + path);
+            
+            for (int i = 0; i < checkpoints.Count; i++)
+            {
+                var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
+
+                tempCheckPointObj.GetComponent<TMP_Text>().text = "CheckPoint " + (i + 1) + "\n" + "Latitude = " + checkpoints[i].Latitude.ToString() + "\n" + "Longitude = " + checkpoints[i].Longitude.ToString();
+            }
         }
         else
         {
