@@ -1,31 +1,72 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Runtime.LevelSystem
 {
     public class LevelManager : MonoBehaviour
     {
         [SerializeField] private List<int> levelBuildIndexes;
-        [SerializeField] private GameObject[] nonDestoyableObjects;
+        [SerializeField] private GameObject[] nonDestroyableObjects;
+        [SerializeField] private Image shaderImage;
+
+        private float _timer = 0f;
+        private const float _zero = 0f;
+
+        private bool _doTransition;
+        private bool _minigameCompleted;
 
         private int _currentLevel = -1;
+        private int _homePageLevel = 1;
+
         private CompletableBehaviour[] _completableBehaviours;
 
         private void Awake()
         {
+            shaderImage.material.shader = Shader.Find("Custom/DiamondMask");
+
             CurrentLevel = 0;
 
-            for (int i = 0; i < nonDestoyableObjects.Length; i++)
+            for (int i = 0; i < nonDestroyableObjects.Length; i++)
             {
-                DontDestroyOnLoad(nonDestoyableObjects[i]);
+                DontDestroyOnLoad(nonDestroyableObjects[i]);
             }
+        }
+
+        private void Update()
+        {
+            if (_doTransition)
+            {
+                _timer += Time.deltaTime;
+                float progress = Mathf.PingPong(_timer, 1f);
+                shaderImage.material.SetFloat("_Progress", progress);
+            }
+
+            print(CurrentLevel);
+            print(_minigameCompleted);
+        }
+
+        IEnumerator PlayTransition()
+        {
+            _doTransition = true;
+
+            yield return new WaitForSeconds(1f);
+
+            NextLevel();
+
+            yield return new WaitForSeconds(1f);
+
+            _doTransition = false;
+            _timer = 0f;
+            shaderImage.material.SetFloat("_Progress", _zero);
         }
 
         public void ForceNextLevel()
         {
-            NextLevel();
+            StartCoroutine(PlayTransition());
         }
 
         private void NextLevel()
@@ -38,11 +79,16 @@ namespace Runtime.LevelSystem
             get => _currentLevel;
             set
             {
-                if (_currentLevel != -1)
+                if (_currentLevel != -1 && !_minigameCompleted)
                 {
                     AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
                     var newValue = value;
                     operation.completed += (_) => LoadNextLevel(newValue);
+                }
+                else if (_currentLevel != -1 && _minigameCompleted)
+                {
+                    AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
+                    operation.completed += (_) => LoadMainMenu();
                 }
                 else
                 {
@@ -58,6 +104,13 @@ namespace Runtime.LevelSystem
             _currentLevel = newLevelIndex;
         }
 
+        private void LoadMainMenu()
+        {
+            AsyncOperation async = SceneManager.LoadSceneAsync("HomePage", LoadSceneMode.Additive);
+            async.completed += OnLevelLoaded;
+            _currentLevel += _homePageLevel;
+        }
+
         private void OnLevelLoaded(AsyncOperation operation)
         {
             _completableBehaviours = FindObjectsOfType<CompletableBehaviour>(true);
@@ -70,9 +123,13 @@ namespace Runtime.LevelSystem
 
         private void HandleCompletableComplete()
         {
-            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted)) return;
+            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted))
+            {
+                return;
+            }
+            _minigameCompleted = true;
 
-            NextLevel();
+            StartCoroutine(PlayTransition());
         }
     }
 }
