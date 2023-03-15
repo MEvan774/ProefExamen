@@ -693,7 +693,7 @@ RectTransform:
   m_Children:
   - {fileID: 1913186027}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1068,7 +1068,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &701825217
 GameObject:
@@ -1270,7 +1270,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 568038401}
-        m_TargetAssemblyTypeName: Runtime.LevelSystem.CompletableBehaviour, Assembly-CSharp
+        m_TargetAssemblyTypeName: CompletableBehaviour, Assembly-CSharp
         m_MethodName: Complete
         m_Mode: 1
         m_Arguments:
@@ -2363,7 +2363,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1496997330
 GameObject:
