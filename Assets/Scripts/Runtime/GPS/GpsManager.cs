@@ -23,9 +23,14 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
+    public decimal Dist;
+
     public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
+<<<<<<< HEAD
+    
+=======
 
     Checkpoint checkpoint = new Checkpoint();
 
@@ -34,6 +39,7 @@ public class GpsManager : MonoBehaviour
     [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
 
+>>>>>>> develop
     void Awake()
     {
         StartCoroutine(AskPermission());
@@ -111,11 +117,16 @@ public class GpsManager : MonoBehaviour
 
     IEnumerator UpdateGPS()
     {
+<<<<<<< HEAD
+        float timeForUpdate = 0.5f; //Every  3 seconds
+=======
         float timeForUpdate = 1f; //Every X seconds
+>>>>>>> develop
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
-        decimal _distance = 0;
+        //decimal Dist = 0;
+        Dist = 0;
         double prevLongitude = 0;
         double prevLatitude = 0;
 
@@ -136,8 +147,17 @@ public class GpsManager : MonoBehaviour
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
+<<<<<<< HEAD
+                Dist += (decimal)dist;
+                texts[4].text = "Distance = " + Dist.ToString() + " km";
+                Debug.Log(longitude);
+                Debug.Log(latitude);
+                Debug.Log(dist);
+                Debug.Log(Dist);
+=======
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+>>>>>>> develop
             }
 
             prevLongitude = longitude;
