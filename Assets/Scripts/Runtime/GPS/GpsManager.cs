@@ -12,10 +12,11 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
+    public decimal Dist;
+
     public TMP_Text[] texts;
 
     private IEnumerator _coroutine;
-
     
     void Awake()
     {
@@ -93,11 +94,12 @@ public class GpsManager : MonoBehaviour
 
     IEnumerator UpdateGPS()
     {
-        float timeForUpdate = 3f; //Every  3 seconds
+        float timeForUpdate = 0.5f; //Every  3 seconds
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
-        decimal _distance = 0;
+        //decimal Dist = 0;
+        Dist = 0;
         double prevLongitude = 0;
         double prevLatitude = 0;
 
@@ -115,12 +117,12 @@ public class GpsManager : MonoBehaviour
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
-                _distance += (decimal)dist;
-                texts[4].text = "Distance = " + _distance.ToString() + " km";
+                Dist += (decimal)dist;
+                texts[4].text = "Distance = " + Dist.ToString() + " km";
                 Debug.Log(longitude);
                 Debug.Log(latitude);
                 Debug.Log(dist);
-                Debug.Log(_distance);
+                Debug.Log(Dist);
             }
 
             prevLongitude = longitude;
