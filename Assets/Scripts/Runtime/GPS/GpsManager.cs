@@ -4,8 +4,11 @@ using UnityEngine.Android;
 using TMPro;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
-[System.Serializable]
+
+[Serializable]
 public class Checkpoint
 {
     public float Latitude;
@@ -27,7 +30,8 @@ public class GpsManager : MonoBehaviour
     Checkpoint checkpoint = new Checkpoint();
 
     public GameObject checkPointObj;
-    
+
+    [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
 
     void Awake()
@@ -211,6 +215,53 @@ public class GpsManager : MonoBehaviour
         Destroy(objToDestroyAt);
     }
 
+    public void SaveCheckPoints()
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        formatter.Serialize(stream, checkpoints);
+        stream.Close();
+
+        Debug.Log("Saved Checkpoints at " + path);
+    }
+
+    public void LoadCheckPoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            List<Checkpoint> loadedCheckpoints = formatter.Deserialize(stream) as List<Checkpoint>;
+            stream.Close();
+
+            checkpoints = loadedCheckpoints;
+
+            Debug.Log("Loaded Checkpoints from " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
+
+    public void DeleteCheckpoints()
+    {
+        string path = Application.persistentDataPath + "/checkpoints.bin";
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            checkpoints.Clear();
+            Debug.Log("Deleted Checkpoints at " + path);
+        }
+        else
+        {
+            Debug.LogError("Checkpoints file not found at " + path);
+        }
+    }
 }
 
 
