@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -27,12 +28,15 @@ namespace Runtime.LevelSystem
             shaderImage.material.shader = Shader.Find("Custom/DiamondMask");
             shaderImage.material.SetFloat("_Progress", _zero);
 
+            shaderImage.material.SetFloat("_Progress", 0);
+
             CurrentLevel = 0;
 
             for (int i = 0; i < nonDestroyableObjects.Length; i++)
             {
                 DontDestroyOnLoad(nonDestroyableObjects[i]);
             }
+            StartCoroutine(AskPermission());
         }
 
         private void Update()
@@ -111,6 +115,36 @@ namespace Runtime.LevelSystem
 
             NextLevel();
             StartCoroutine(PlayTransition());
+        }
+        IEnumerator AskPermission()
+        {
+            //handle permission
+            bool _hasFineLocationPermission = Permission.HasUserAuthorizedPermission(Permission.FineLocation);
+            bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+
+            //WE HAVE PERMISSION SO WE CAN START THE SERVICE
+            if (_hasFineLocationPermission)
+            {
+                yield break;
+            }
+
+            if (_hasMicrophonePermission)
+            {
+                yield break;
+            }
+
+            PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+
+            //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
+            _permissionCallbacks.PermissionGranted += s => { };
+
+            _permissionCallbacks.PermissionDenied += s => { };
+
+            _permissionCallbacks.PermissionDeniedAndDontAskAgain += s => { };
+
+            Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
+
+            Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
         }
     }
 }
