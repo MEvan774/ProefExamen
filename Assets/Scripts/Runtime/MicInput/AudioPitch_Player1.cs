@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections;
 using PitchDetector;
 using UnityEngine.Android;
+using TMPro;
 
 public class AudioPitch_Player1 : MonoBehaviour {
 
+	public TextMeshProUGUI Text;
 	public string SelectedDevice { get; private set; }	//Mic selected
     public string SelectedMic;
 
@@ -62,7 +64,7 @@ public class AudioPitch_Player1 : MonoBehaviour {
 		SelectedDevice = Microphone.devices[MicInput].ToString();
 		SelectedMic = SelectedDevice;
 		GetMicCaps();
-
+		Debug.Log("LOLOL");
 		//Estimates bufer len, based on pitchTimeInterval value
 		int bufferLen = (int)Mathf.Round(AudioSettings.outputSampleRate * PitchTimeInterval / 1000f);
 		_data = new float[bufferLen];
@@ -70,7 +72,16 @@ public class AudioPitch_Player1 : MonoBehaviour {
 		_madeDetections = new int[_maxDetectionsAllowed]; //Allocates detection buffer
 		setUptMic();
 
-		StartCoroutine(RepeatUnscaledTime());
+		//StartCoroutine(RepeatUnscaledTime());
+		InvokeRepeating("DelayedTime",0,1f);
+	}
+
+	void DelayedTime()
+	{
+		Debug.Log("PItch = " + CurrentPublicAmplitude);
+
+				ListenAudioInput();
+		//StartCoroutine(RepeatUnscaledTime());
 	}
 
 	IEnumerator RepeatUnscaledTime()
@@ -83,7 +94,7 @@ public class AudioPitch_Player1 : MonoBehaviour {
 			yield return null;
 		}
 
-		Debug.Log("PItch = " + CurrentPublicPitch);
+
 
 		ListenAudioInput();
 		StartCoroutine(RepeatUnscaledTime());
@@ -98,10 +109,10 @@ public class AudioPitch_Player1 : MonoBehaviour {
 		float rmsValue = Mathf.Sqrt(sum / _data.Length);
 		float dbValue = 30f * Mathf.Log10(rmsValue / _refValue);
 		CurrentPublicAmplitude = dbValue;
-
+		Text.text = CurrentPublicAmplitude.ToString();
 		if (dbValue < MinVolumeDB)
 			return;
-
+		/*
 		_pitchDetector.DetectPitch(_data);
 		int midiant = _pitchDetector.lastMidiNote();
 		int midi = findMode();
@@ -109,7 +120,7 @@ public class AudioPitch_Player1 : MonoBehaviour {
 		CurrentPublicPitch = CurrentPitch;
 		_madeDetections[_detectionPointer++] = midiant;
 		_detectionPointer %= CumulativeDetection;
-
+		*/
 		if (_audioSource.time >= 9.0f && _isDoingClean == true)
 		{
 			CleanClip();
@@ -189,14 +200,22 @@ public class AudioPitch_Player1 : MonoBehaviour {
     {
         //handle permission
         bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+		Debug.Log("Permissie");
+		//WE HAVE PERMISSION SO WE CAN START THE SERVICE
+		yield return new WaitForSeconds(1f);
+        //_hasMicrophonePermission |= Permission.HasUserAuthorizedPermission(Permission.Microphone);
 
-        //WE HAVE PERMISSION SO WE CAN START THE SERVICE
         if (_hasMicrophonePermission)
         {
-            yield break;
-        }
+			GetMic();
 
-        PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+			//InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
+
+			StartCoroutine(RepeatUnscaledTime());
+		}
+
+
+		PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
         //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
         _permissionCallbacks.PermissionGranted += s => {
             GetMic();
@@ -218,4 +237,40 @@ public class AudioPitch_Player1 : MonoBehaviour {
 
         Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
     }
+
+	/*
+	IEnumerator AskPermission()
+	{
+		//handle permission
+		bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+		Debug.Log("Permissie");
+		//WE HAVE PERMISSION SO WE CAN START THE SERVICE
+		if (_hasMicrophonePermission)
+		{
+			yield break;
+		}
+
+		PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+		//WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
+		_permissionCallbacks.PermissionGranted += s => {
+			GetMic();
+
+			//InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
+
+			StartCoroutine(RepeatUnscaledTime());
+		};
+
+		_permissionCallbacks.PermissionDenied += s => { };
+
+		_permissionCallbacks.PermissionDeniedAndDontAskAgain += s => {
+			GetMic();
+
+			//InvokeRepeating("ListenAudioInput", 0.01f, 0.018f);
+
+			StartCoroutine(RepeatUnscaledTime());
+		};
+
+		Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
+	}
+	*/
 }

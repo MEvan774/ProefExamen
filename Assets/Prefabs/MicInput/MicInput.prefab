@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3272120188424181450
+--- !u!1 &3265083453187150429
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,40 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3272120188424181453}
-  - component: {fileID: 3272120188424181454}
-  - component: {fileID: 3272120188424181455}
-  - component: {fileID: 3272120188424181448}
-  - component: {fileID: 3272120188424181449}
+  - component: {fileID: 3265083453187150424}
+  - component: {fileID: 3265083453187150427}
+  - component: {fileID: 3265083453187150426}
   m_Layer: 0
-  m_Name: MicInputManager
+  m_Name: MicInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3272120188424181453
+--- !u!4 &3265083453187150424
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272120188424181450}
+  m_GameObject: {fileID: 3265083453187150429}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 73.22281, y: 154.39763, z: -103.73695}
+  m_LocalPosition: {x: 1.68546, y: 1.0969039, z: 2.8737776}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &3272120188424181454
+--- !u!82 &3265083453187150427
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272120188424181450}
+  m_GameObject: {fileID: 3265083453187150429}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
@@ -49,7 +47,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -131,50 +129,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3272120188424181455
+--- !u!114 &3265083453187150426
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272120188424181450}
+  m_GameObject: {fileID: 3265083453187150429}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d0cc6cdcdbb9404dad41abdfc7115dd, type: 3}
+  m_Script: {fileID: 11500000, guid: 3237663979969d843a1b8b8604239c30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsListeningToAudioListener: 0
-  AudioProfile: 0
-  channel: 0
---- !u!114 &3272120188424181448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272120188424181450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c7f9446142595b448507e83f1917a72, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SelectedMic: 
-  CurrentPublicAmplitude: 0
-  MinVolumeDB: -30
-  MicInput: 0
-  CurrentPublicPitch: 0
-  CumulativeDetection: 5
-  PitchTimeInterval: 100
---- !u!114 &3272120188424181449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272120188424181450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca9a366401d13ce4a9321c0d814ec9ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SilenceAmplitude: 0
+  sensitivity: 100
+  loudness: 0

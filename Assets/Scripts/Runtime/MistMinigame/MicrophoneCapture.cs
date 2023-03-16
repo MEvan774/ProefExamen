@@ -8,6 +8,7 @@ public class MicrophoneCapture : MonoBehaviour
     public float loudness = 0;
     private AudioSource _source;
 
+
     void Start()
     {
         _source = GetComponent<AudioSource>();
@@ -16,14 +17,18 @@ public class MicrophoneCapture : MonoBehaviour
         _source.volume = 0.001f;
         while (!(Microphone.GetPosition(null) > 0)) { }
         _source.Play();
+        StartCoroutine(AskPermission());
+
+        InvokeRepeating("Loudness", 1.1f, 1f);//using invoke instead of update to avoid performance issues
     }
 
-    void Update()
+    void Loudness()//gives loudness
     {
         loudness = GetAvgVol() * sensitivity;
+        Debug.Log(-loudness);
     }
 
-    float GetAvgVol()
+    float GetAvgVol()//calculates averege volume
     {
         float[] data = new float[64];
         float a = 0;
