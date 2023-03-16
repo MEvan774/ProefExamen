@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Art/Textures/Ree/ree_perspectivepuzzle_BaseColor.png.meta
-guid: c9182ecca71afe34ab44a3af8fed7d05
-========
-guid: 1303a93ab9647454591c2d1d236c0131
->>>>>>>> develop:Assets/Art/Textures/MistMinigame/Vos_PNG.png.meta
+guid: 99f75dbc30be03747b8ada72f181f9ce
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

@@ -17,7 +17,6 @@ public class MicrophoneCapture : MonoBehaviour
         _source.volume = 0.001f;
         while (!(Microphone.GetPosition(null) > 0)) { }
         _source.Play();
-        StartCoroutine(AskPermission());
 
         InvokeRepeating("Loudness", 1.1f, 1f);//using invoke instead of update to avoid performance issues
     }
