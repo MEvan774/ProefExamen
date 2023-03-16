@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748171, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -857,7 +857,7 @@ RectTransform:
   m_Children:
   - {fileID: 1913186027}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1578,7 +1578,6 @@ RectTransform:
   - {fileID: 1571022030}
   - {fileID: 2001844301}
   - {fileID: 123889429}
-  - {fileID: 1144566309}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2216,14 +2215,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1144566308}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1174171418}
   - {fileID: 1005185564}
-  m_Father: {fileID: 800750494}
+  m_Father: {fileID: 2001844301}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2822,7 +2821,9 @@ MonoBehaviour:
   - {fileID: 1744019660}
   checkPointObj: {fileID: 383416493}
   checkpoints: []
-  playerIndex: 0
+  onCheckpointReached:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1338764249
 Transform:
   m_ObjectHideFlags: 0
@@ -2836,7 +2837,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1496997330
 GameObject:
@@ -3791,6 +3792,7 @@ RectTransform:
   - {fileID: 709981345}
   - {fileID: 1190642219}
   - {fileID: 1918039639}
+  - {fileID: 1144566309}
   m_Father: {fileID: 800750494}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

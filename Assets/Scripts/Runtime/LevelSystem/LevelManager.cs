@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -36,6 +37,7 @@ namespace Runtime.LevelSystem
             {
                 DontDestroyOnLoad(nonDestroyableObjects[i]);
             }
+            StartCoroutine(AskPermission());
         }
 
         private void Update()
@@ -46,9 +48,6 @@ namespace Runtime.LevelSystem
                 float progress = Mathf.PingPong(_timer, 1f);
                 shaderImage.material.SetFloat("_Progress", progress);
             }
-
-            print(CurrentLevel);
-            print(_minigameCompleted);
         }
 
         IEnumerator PlayTransition()
@@ -132,6 +131,36 @@ namespace Runtime.LevelSystem
             _minigameCompleted = true;
 
             StartCoroutine(PlayTransition());
+        }
+        IEnumerator AskPermission()
+        {
+            //handle permission
+            bool _hasFineLocationPermission = Permission.HasUserAuthorizedPermission(Permission.FineLocation);
+            bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+
+            //WE HAVE PERMISSION SO WE CAN START THE SERVICE
+            if (_hasFineLocationPermission)
+            {
+                yield break;
+            }
+
+            if (_hasMicrophonePermission)
+            {
+                yield break;
+            }
+
+            PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+
+            //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
+            _permissionCallbacks.PermissionGranted += s => { };
+
+            _permissionCallbacks.PermissionDenied += s => { };
+
+            _permissionCallbacks.PermissionDeniedAndDontAskAgain += s => { };
+
+            Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
+
+            Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
         }
     }
 }

@@ -1,12 +1,11 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Android;
 using TMPro;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using UnityEngine.Events;
 
 [Serializable]
 public class Checkpoint
@@ -34,40 +33,17 @@ public class GpsManager : MonoBehaviour
     [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
 
-    public int playerIndex;
+    public UnityEvent onCheckpointReached;
 
     void Awake()
     {
-        StartCoroutine(AskPermission());
-
         for (int i = 0; i < texts.Length; i++)
         {
-            texts[i].text = "DEBUG DEBUG";
+            texts[i].text = "Starting Up";
         }
     }
 
-    IEnumerator AskPermission()
-    {
-        //handle permission
-        bool _hasFineLocationPermission = Permission.HasUserAuthorizedPermission(Permission.FineLocation);
 
-        //WE HAVE PERMISSION SO WE CAN START THE SERVICE
-        if (_hasFineLocationPermission)
-        {
-            yield break;
-        }
-
-        PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
-        //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
-        _permissionCallbacks.PermissionGranted += s =>{};
-
-        _permissionCallbacks.PermissionDenied += s =>{};
-
-        _permissionCallbacks.PermissionDeniedAndDontAskAgain += s =>{};
-
-        Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
-
-    }
 
     IEnumerator Start()
     {
@@ -90,7 +66,7 @@ public class GpsManager : MonoBehaviour
         {
             for (int i = 0; i < texts.Length; i++)
             {
-            texts[i].text = "Timed out.";
+                texts[i].text = "Timed out.";
             }
             yield break;
         }
@@ -124,6 +100,7 @@ public class GpsManager : MonoBehaviour
 
         while (true)
         {
+
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
 
@@ -136,30 +113,24 @@ public class GpsManager : MonoBehaviour
             checkpoint.Latitude = latitude;
             checkpoint.Longitude = longitude;
 
+            // Set a threshold distance in meters
+            double threshold = 5;
+
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
 
                 _distance += (decimal)dist;
                 texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
-                texts[5].text =  playerIndex + " " + Distance(latitude, longitude, checkpoints[playerIndex].Latitude, checkpoints[playerIndex].Longitude).ToString();
+                if (dist <= threshold)
+                {
+                    // Call your event
+                    onCheckpointReached.Invoke();
+                }
             }
 
             prevLongitude = longitude;
             prevLatitude = latitude;
-            if (checkpoints != null)
-            {
-                break;
-            }
-            if (Distance(latitude, longitude, checkpoints[playerIndex].Latitude, checkpoints[playerIndex].Longitude) == 0)
-            {
-                playerIndex++;
-                //event callen
-            }
-            if (playerIndex == checkpoints.Count) 
-            { 
-                playerIndex = 0;
-            }   
 
             yield return updateTime;
         }
@@ -225,7 +196,7 @@ public class GpsManager : MonoBehaviour
 
         int index = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex();
 
-        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject; 
+        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject;
 
         checkpoints.RemoveAt(index);
 
@@ -257,7 +228,7 @@ public class GpsManager : MonoBehaviour
 
             checkpoints = loadedCheckpoints;
             Debug.Log("Loaded Checkpoints from " + path);
-            
+
             for (int i = 0; i < checkpoints.Count; i++)
             {
                 var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
