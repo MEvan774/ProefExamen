@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -17,16 +18,17 @@ namespace Runtime.LevelSystem
         private const float _zero = 0f;
 
         private bool _doTransition;
-        private bool _minigameCompleted;
 
         private int _currentLevel = -1;
-        private int _homePageLevel = 1;
 
         private CompletableBehaviour[] _completableBehaviours;
 
         private void Awake()
         {
             shaderImage.material.shader = Shader.Find("Custom/DiamondMask");
+            shaderImage.material.SetFloat("_Progress", _zero);
+
+            shaderImage.material.SetFloat("_Progress", 0);
 
             CurrentLevel = 0;
 
@@ -34,6 +36,7 @@ namespace Runtime.LevelSystem
             {
                 DontDestroyOnLoad(nonDestroyableObjects[i]);
             }
+            StartCoroutine(AskPermission());
         }
 
         private void Update()
@@ -44,9 +47,6 @@ namespace Runtime.LevelSystem
                 float progress = Mathf.PingPong(_timer, 1f);
                 shaderImage.material.SetFloat("_Progress", progress);
             }
-
-            print(CurrentLevel);
-            print(_minigameCompleted);
         }
 
         IEnumerator PlayTransition()
@@ -55,7 +55,7 @@ namespace Runtime.LevelSystem
 
             yield return new WaitForSeconds(1f);
 
-            NextLevel();
+            //NextLevel();
 
             yield return new WaitForSeconds(1f);
 
@@ -79,36 +79,24 @@ namespace Runtime.LevelSystem
             get => _currentLevel;
             set
             {
-                if (_currentLevel != -1 && !_minigameCompleted)
+                if (_currentLevel != -1)
                 {
                     AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
                     var newValue = value;
-                    operation.completed += (_) => LoadNextLevel(newValue);
-                }
-                else if (_currentLevel != -1 && _minigameCompleted)
-                {
-                    AsyncOperation operation = SceneManager.UnloadSceneAsync(levelBuildIndexes[_currentLevel]);
-                    operation.completed += (_) => LoadMainMenu();
+                    operation.completed += (_) => LoadMinigameLevel(newValue);
                 }
                 else
                 {
-                    LoadNextLevel(value);
+                    LoadMinigameLevel(value);
                 }
             }
         }
 
-        private void LoadNextLevel(int newLevelIndex)
+        private void LoadMinigameLevel(int newLevelIndex)
         {
             AsyncOperation async = SceneManager.LoadSceneAsync(levelBuildIndexes[newLevelIndex], LoadSceneMode.Additive);
             async.completed += OnLevelLoaded;
             _currentLevel = newLevelIndex;
-        }
-
-        private void LoadMainMenu()
-        {
-            AsyncOperation async = SceneManager.LoadSceneAsync("HomePage", LoadSceneMode.Additive);
-            async.completed += OnLevelLoaded;
-            _currentLevel += _homePageLevel;
         }
 
         private void OnLevelLoaded(AsyncOperation operation)
@@ -123,13 +111,40 @@ namespace Runtime.LevelSystem
 
         private void HandleCompletableComplete()
         {
-            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted))
-            {
-                return;
-            }
-            _minigameCompleted = true;
+            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted)) return;
 
+            NextLevel();
             StartCoroutine(PlayTransition());
+        }
+        IEnumerator AskPermission()
+        {
+            //handle permission
+            bool _hasFineLocationPermission = Permission.HasUserAuthorizedPermission(Permission.FineLocation);
+            bool _hasMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
+
+            //WE HAVE PERMISSION SO WE CAN START THE SERVICE
+            if (_hasFineLocationPermission)
+            {
+                yield break;
+            }
+
+            if (_hasMicrophonePermission)
+            {
+                yield break;
+            }
+
+            PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
+
+            //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
+            _permissionCallbacks.PermissionGranted += s => { };
+
+            _permissionCallbacks.PermissionDenied += s => { };
+
+            _permissionCallbacks.PermissionDeniedAndDontAskAgain += s => { };
+
+            Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
+
+            Permission.RequestUserPermission(Permission.Microphone, _permissionCallbacks);
         }
     }
 }

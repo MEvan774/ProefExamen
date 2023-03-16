@@ -491,6 +491,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -5302647975081204596, guid: cd961310a31d09e4f929847e90ed04d8,
         type: 3}
+      propertyPath: m_Name
+      value: Ree_Whole_Placeholder
+      objectReference: {fileID: 0}
+    - target: {fileID: -5302647975081204596, guid: cd961310a31d09e4f929847e90ed04d8,
+        type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -533,6 +538,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4476059718748502870, guid: cd961310a31d09e4f929847e90ed04d8,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4476059718748502870, guid: cd961310a31d09e4f929847e90ed04d8,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6744490012706483633, guid: cd961310a31d09e4f929847e90ed04d8,
         type: 3}

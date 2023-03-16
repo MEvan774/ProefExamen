@@ -1,12 +1,11 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Android;
 using TMPro;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-
+using UnityEngine.Events;
 
 [Serializable]
 public class Checkpoint
@@ -23,9 +22,7 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
-    public decimal _distance;
-
-    public TMP_Text[] texts;
+    public TMP_Text distanceText;
 
     private IEnumerator _coroutine;
 
@@ -36,42 +33,19 @@ public class GpsManager : MonoBehaviour
     [SerializeField]
     public List<Checkpoint> checkpoints = new List<Checkpoint>();
 
+    public UnityEvent onCheckpointReached;
+
     void Awake()
     {
-        StartCoroutine(AskPermission());
-
-        for (int i = 0; i < texts.Length; i++)
-        {
-            texts[i].text = "DEBUG DEBUG";
-        }
+        distanceText.text = "Starting Up";
     }
 
-    IEnumerator AskPermission()
-    {
-        //handle permission
-        bool _hasFineLocationPermission = Permission.HasUserAuthorizedPermission(Permission.FineLocation);
 
-        //WE HAVE PERMISSION SO WE CAN START THE SERVICE
-        if (_hasFineLocationPermission)
-        {
-            yield break;
-        }
-
-        PermissionCallbacks _permissionCallbacks = new PermissionCallbacks();
-        //WE DON'T HAVE PERMISSION SO WE REQUEST IT AND START SERVICES ON GRANTED.
-        _permissionCallbacks.PermissionGranted += s =>{};
-
-        _permissionCallbacks.PermissionDenied += s =>{};
-
-        _permissionCallbacks.PermissionDeniedAndDontAskAgain += s =>{};
-
-        Permission.RequestUserPermission(Permission.FineLocation, _permissionCallbacks);
-
-    }
 
     IEnumerator Start()
     {
         _coroutine = UpdateGPS();
+        LoadCheckPoints();
 
         if (!Input.location.isEnabledByUser)
             yield break;
@@ -87,20 +61,16 @@ public class GpsManager : MonoBehaviour
 
         if (maxWait < 1)
         {
-            for (int i = 0; i < texts.Length; i++)
-            {
-            texts[i].text = "Timed out.";
-            }
+
+                distanceText.text = "Timed out.";
+
             yield break;
         }
 
 
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            for (int i = 0; i < texts.Length; i++)
-            {
-                texts[i].text = "Unable to determine device location";
-            }
+            distanceText.text = "Unable to determine device location";
             yield break;
         }
         else
@@ -114,35 +84,36 @@ public class GpsManager : MonoBehaviour
     IEnumerator UpdateGPS()
     {
         float timeForUpdate = 1f; //Every X seconds
-
         WaitForSeconds updateTime = new WaitForSeconds(timeForUpdate);
 
         //Store the values to a temp variables  
-        //decimal Dist = 0;
-        _distance = 0;
+        decimal _distance = 0;
         double prevLongitude = 0;
         double prevLatitude = 0;
 
         while (true)
         {
+
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
 
-            texts[0].text = "Start Latitude = " + startLatitude.ToString();
-            texts[1].text = "Start Longitude = " + startLongitude.ToString();
-
-            texts[2].text = "Latitude = " + latitude.ToString();
-            texts[3].text = "Longitude = " + longitude.ToString();
-
             checkpoint.Latitude = latitude;
             checkpoint.Longitude = longitude;
+
+            // Set a threshold distance in meters
+            double threshold = 5;
 
             if (prevLongitude != 0 && prevLatitude != 0)
             {
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
 
                 _distance += (decimal)dist;
-                texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+                distanceText.text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+                if (dist <= threshold)
+                {
+                    // Call your event
+                    onCheckpointReached.Invoke();
+                }
             }
 
             prevLongitude = longitude;
@@ -158,7 +129,6 @@ public class GpsManager : MonoBehaviour
         Important in navigation, it is a special case of a more general formula in spherical trigonometry, the law of haversines, that relates the sides and angles of spherical triangles.
         //Reference for the formula https://en.wikipedia.org/wiki/Haversine_formula
     */
-
     public double Distance(double lat1, double lon1, double lat2, double lon2)
     {
         const double radius = 6371.0; // Earth's radius in kilometers
@@ -213,7 +183,7 @@ public class GpsManager : MonoBehaviour
 
         int index = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex();
 
-        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject; 
+        GameObject objToDestroyAt = GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetChild(GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform.GetSiblingIndex()).gameObject;
 
         checkpoints.RemoveAt(index);
 
@@ -244,8 +214,14 @@ public class GpsManager : MonoBehaviour
             stream.Close();
 
             checkpoints = loadedCheckpoints;
-
             Debug.Log("Loaded Checkpoints from " + path);
+
+            for (int i = 0; i < checkpoints.Count; i++)
+            {
+                var tempCheckPointObj = Instantiate(checkPointObj, GameObject.FindGameObjectWithTag("CheckPointLayout").gameObject.transform);
+
+                tempCheckPointObj.GetComponent<TMP_Text>().text = "CheckPoint " + (i + 1) + "\n" + "Latitude = " + checkpoints[i].Latitude.ToString() + "\n" + "Longitude = " + checkpoints[i].Longitude.ToString();
+            }
         }
         else
         {

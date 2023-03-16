@@ -506,7 +506,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6803500798443646629, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500798733249907, guid: 79d3d1a1b0899d943b723776b33fff44,
@@ -621,42 +621,42 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6803500798890716902, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500798900196026, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500798916625109, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500799642838842, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500799818736127, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500800042032661, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500800152350910, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     - target: {fileID: 6803500800555358615, guid: 79d3d1a1b0899d943b723776b33fff44,
         type: 3}
-      propertyPath: _manager
+      propertyPath: manager
       value: 
       objectReference: {fileID: 1961435336}
     m_RemovedComponents: []
