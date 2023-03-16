@@ -1,12 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class MistMinigameHandler : MonoBehaviour
 {
     [SerializeField] private AudioPitch_Player1 _audioInput;
-    [SerializeField] private UnityEvent onMistGameCompleted;
+    [SerializeField] private MicrophoneCapture _micInput;
+    [SerializeField] private Transform _camTrans;
+
+    [SerializeField] private UnityEvent _onMistGameCompleted;
 
     private MeshRenderer _mistRenderer;
 
@@ -23,26 +24,42 @@ public class MistMinigameHandler : MonoBehaviour
 
     void LateUpdate()
     {
-        _pitchInput = _audioInput.CurrentPublicPitch;
-
-        if (_pitchInput > 5)
+        _pitchInput = _micInput.loudness;
+ 
+        if (_pitchInput > 0.006f)//removes mist when mic input treshold has passed
         {
-            _mistAmount -= (Time.deltaTime / 10);
+            _mistAmount -= (Time.deltaTime / 6);
             _mistRenderer.material.SetFloat("_Alpha", _mistAmount);
         }
-        if (_mistAmount < 0.05f && _isLookingAt && !_isGameClear)
+        else if (_mistAmount < 1 && _mistAmount > 0)//when no input is detected, the mist will come back
+        {
+            _mistAmount += (Time.deltaTime / 10);
+            _mistRenderer.material.SetFloat("_Alpha", _mistAmount);
+        }
+
+        RaycastHit _hit;
+
+        if(Physics.Raycast(_camTrans.position, transform.TransformDirection(Vector3.forward), out _hit, 200))
+        {
+            _isLookingAt = true;
+        }
+        else
+            _isLookingAt = false;
+
+
+        if (_mistAmount < 0.15f && _isLookingAt && !_isGameClear)//when player found the fox, the scene will transition to main scene
         {
             _isGameClear = true;
             OnMinigameClear();
         }
     }
 
-    void OnMinigameClear()
+    void OnMinigameClear()//when minigame is completed, this event will be invoked
     {
-        onMistGameCompleted.Invoke();
+        _onMistGameCompleted.Invoke();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)//checks if player looks at fox
     {
         _isLookingAt = true;
     }

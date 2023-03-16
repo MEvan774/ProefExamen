@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.Profiling;
@@ -10,7 +9,8 @@ public class MicrophoneCapture : MonoBehaviour
     public float sensitivity = 100;
     public float loudness = 0;
     private AudioSource _source;
-    void Start()
+
+    void Start()//prepares mic for use
     {
         _source = GetComponent<AudioSource>();
         _source.clip = Microphone.Start(null, true, 10, 44100);
@@ -19,16 +19,17 @@ public class MicrophoneCapture : MonoBehaviour
         while (!(Microphone.GetPosition(null) > 0)) { }
         _source.Play();
         StartCoroutine(AskPermission());
+
+        InvokeRepeating("Loudness", 1.1f, 1f);//using invoke instead of update to avoid performance issues
     }
-    void Update()
+
+    void Loudness()//gives loudness
     {
-
         loudness = GetAvgVol() * sensitivity;
-        Debug.Log(loudness);
-
+        Debug.Log(-loudness);
     }
 
-    float GetAvgVol()
+    float GetAvgVol()//calculates averege volume
     {
         float[] data = new float[64];
         float a = 0;
@@ -39,9 +40,9 @@ public class MicrophoneCapture : MonoBehaviour
         }
         return a / 64f;
     }
-    IEnumerator AskPermission()
+
+    IEnumerator AskPermission()//gets permission to use mic
     {
-        //handle permission
         bool _hasFMicrophonePermission = Permission.HasUserAuthorizedPermission(Permission.Microphone);
 
         //WE HAVE PERMISSION SO WE CAN START THE SERVICE
