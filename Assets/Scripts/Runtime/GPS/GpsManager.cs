@@ -22,7 +22,7 @@ public class GpsManager : MonoBehaviour
     [HideInInspector] public float startLongitude;
     [HideInInspector] public Decimal distance;
 
-    public TMP_Text[] texts;
+    public TMP_Text distanceText;
 
     private IEnumerator _coroutine;
 
@@ -37,10 +37,7 @@ public class GpsManager : MonoBehaviour
 
     void Awake()
     {
-        for (int i = 0; i < texts.Length; i++)
-        {
-            texts[i].text = "Starting Up";
-        }
+        distanceText.text = "Starting Up";
     }
 
 
@@ -64,20 +61,16 @@ public class GpsManager : MonoBehaviour
 
         if (maxWait < 1)
         {
-            for (int i = 0; i < texts.Length; i++)
-            {
-                texts[i].text = "Timed out.";
-            }
+
+                distanceText.text = "Timed out.";
+
             yield break;
         }
 
 
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            for (int i = 0; i < texts.Length; i++)
-            {
-                texts[i].text = "Unable to determine device location";
-            }
+            distanceText.text = "Unable to determine device location";
             yield break;
         }
         else
@@ -104,12 +97,6 @@ public class GpsManager : MonoBehaviour
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
 
-            texts[0].text = "Start Latitude = " + startLatitude.ToString();
-            texts[1].text = "Start Longitude = " + startLongitude.ToString();
-
-            texts[2].text = "Latitude = " + latitude.ToString();
-            texts[3].text = "Longitude = " + longitude.ToString();
-
             checkpoint.Latitude = latitude;
             checkpoint.Longitude = longitude;
 
@@ -121,7 +108,7 @@ public class GpsManager : MonoBehaviour
                 double dist = Distance(prevLatitude, prevLongitude, latitude, longitude);
 
                 _distance += (decimal)dist;
-                texts[4].text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
+                distanceText.text = "Distance = " + Decimal.Round(_distance, 3).ToString() + " km";
                 if (dist <= threshold)
                 {
                     // Call your event
