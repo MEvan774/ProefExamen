@@ -5,44 +5,43 @@ using UnityEngine.UI;
 
 public class PopUp : MonoBehaviour
 {
-    GameObject dropDownMenu;
-
     [Range(0, 30)]
-    [SerializeField] float dropDownLength = 3.32f;
+    [SerializeField] private float dropDownLength = 3.32f;
 
-    [SerializeField] AnimationCurve easeCurve;
+    [SerializeField] private AnimationCurve easeCurve;
 
-    private AudioSource notifyAudio;
-    private Vector2 transRef;
-    private Text dropDownText;
+    private AudioSource _notifyAudio;
+    private GameObject _dropDownMenu;
+    private Vector2 _transRef;
+    private Text _dropDownText;
 
     // Start is called before the first frame update
     void Start()
     {
-        dropDownText = GetComponentInChildren<Text>();
-        dropDownMenu = gameObject;
-        transRef = new Vector2(dropDownMenu.transform.localPosition.x, dropDownMenu.transform.localPosition.y);
+        _dropDownText = GetComponentInChildren<Text>();
+        _dropDownMenu = gameObject;
+        _transRef = new Vector2(_dropDownMenu.transform.localPosition.x, _dropDownMenu.transform.localPosition.y);
 
-        notifyAudio = gameObject.GetComponent<AudioSource>();
+        _notifyAudio = gameObject.GetComponent<AudioSource>();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            DropEaseEvent("dlof");
+            DropEaseEvent("DropDownTextInput");
         }
     }
 
     void DropEaseEvent(string _TextInput)
     {
-        dropDownText.text = _TextInput;
-        StartCoroutine(dropEase());
+        _dropDownText.text = _TextInput;
+        StartCoroutine(DropEase());
     }
 
-    public IEnumerator dropEase()
+    public IEnumerator DropEase()
     {
-        notifyAudio.Play();
+        _notifyAudio.Play();
 
         Handheld.Vibrate();
 
@@ -55,7 +54,7 @@ public class PopUp : MonoBehaviour
 
             float ease = Mathf.Lerp(0, 1, elapsedTime);
 
-            dropDownMenu.transform.localPosition = new Vector2(dropDownMenu.transform.localPosition.x, dropDownMenu.transform.localPosition.y + easeInOutBack(ease) * -dropDownLength);
+            _dropDownMenu.transform.localPosition = new Vector2(_dropDownMenu.transform.localPosition.x, _dropDownMenu.transform.localPosition.y + EaseInOutBack(ease) * -dropDownLength);
 
             yield return null;
         }
@@ -70,18 +69,15 @@ public class PopUp : MonoBehaviour
 
             float ease = Mathf.Lerp(0, 1, elapsedTime);
 
-            dropDownMenu.transform.localPosition = new Vector2(dropDownMenu.transform.localPosition.x, dropDownMenu.transform.localPosition.y + easeInOutBack(ease) * dropDownLength);
+            _dropDownMenu.transform.localPosition = new Vector2(_dropDownMenu.transform.localPosition.x, _dropDownMenu.transform.localPosition.y + EaseInOutBack(ease) * dropDownLength);
 
             yield return null;
         }
 
-
-        dropDownMenu.transform.localPosition = transRef;
-
-
+        _dropDownMenu.transform.localPosition = _transRef;
     }
 
-    float easeInOutBack(float x)
+    float EaseInOutBack(float x)
     {
         float c1 = 1.70158f;
         float c2 = c1 * 1.525f;
