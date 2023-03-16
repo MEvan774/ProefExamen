@@ -1270,7 +1270,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 568038401}
-        m_TargetAssemblyTypeName: CompletableBehaviour, Assembly-CSharp
+        m_TargetAssemblyTypeName: Runtime.LevelSystem.CompletableBehaviour, Assembly-CSharp
         m_MethodName: Complete
         m_Mode: 1
         m_Arguments:

@@ -342,7 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6607305ef7615a4fbf6cc55d0bc2ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelBuildIndexes: 010000000200000003000000020000000500000002000000060000000200000006000000
+  levelBuildIndexes: 010000000200000003000000040000000500000006000000
   nonDestroyableObjects:
   - {fileID: 1659859597}
   - {fileID: 656880745}

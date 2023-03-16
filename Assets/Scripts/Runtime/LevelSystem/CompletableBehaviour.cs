@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace Runtime.LevelSystem
+{
     public abstract class CompletableBehaviour : MonoBehaviour
     {
         private bool _isCompleted;
@@ -21,3 +23,4 @@ using UnityEngine.Events;
 
         public bool IsCompleted => _isCompleted;
     }
+}

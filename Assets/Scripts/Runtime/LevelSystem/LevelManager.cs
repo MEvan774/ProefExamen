@@ -4,6 +4,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+namespace Runtime.LevelSystem
+{
     public class LevelManager : MonoBehaviour
     {
         [SerializeField] private List<int> levelBuildIndexes;
@@ -30,7 +33,6 @@ using UnityEngine.UI;
             {
                 DontDestroyOnLoad(nonDestroyableObjects[i]);
             }
-            DontDestroyOnLoad(gameObject);
         }
 
         private void Update()
@@ -89,7 +91,7 @@ using UnityEngine.UI;
         private void LoadMinigameLevel(int newLevelIndex)
         {
             AsyncOperation async = SceneManager.LoadSceneAsync(levelBuildIndexes[newLevelIndex], LoadSceneMode.Additive);
-            //async.completed += OnLevelLoaded;
+            async.completed += OnLevelLoaded;
             _currentLevel = newLevelIndex;
         }
 
@@ -105,6 +107,9 @@ using UnityEngine.UI;
 
         private void HandleCompletableComplete()
         {
+            if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted)) return;
+
             StartCoroutine(PlayTransition());
         }
     }
+}
