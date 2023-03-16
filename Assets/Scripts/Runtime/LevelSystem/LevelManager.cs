@@ -51,7 +51,7 @@ namespace Runtime.LevelSystem
 
             yield return new WaitForSeconds(1f);
 
-            NextLevel();
+            //NextLevel();
 
             yield return new WaitForSeconds(1f);
 
@@ -109,6 +109,7 @@ namespace Runtime.LevelSystem
         {
             if (_completableBehaviours.Any(behaviour => !behaviour.IsCompleted)) return;
 
+            NextLevel();
             StartCoroutine(PlayTransition());
         }
     }
