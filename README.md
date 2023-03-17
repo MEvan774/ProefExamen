@@ -8,3 +8,7 @@
 - Jesper Ceria
 - Lennard Hartog (Art Lead)
 - Yessie Blaas
+
+## Playable demo:
+Alleen speelbaar via Android
+https://drive.google.com/file/d/1uyEPcNmxclMPnKKgZ06kIfwlEhxmURnq/view?usp=share_link
